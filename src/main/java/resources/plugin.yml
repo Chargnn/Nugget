@@ -1,0 +1,7 @@
+name: Nugget
+version: 0.1
+main:  com.chargnn.Main
+commands:
+  econ:
+    description: "Econ commmand"
+    usage: /[set/add/clear] {player} (amount)
