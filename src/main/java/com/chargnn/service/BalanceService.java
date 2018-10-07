@@ -340,30 +340,6 @@ public class BalanceService implements Economy {
     }
 
     /**
-     * Set an amount to a player - DO NOT USE NEGATIVE AMOUNTS
-     *
-     * @param playerName to deposit to
-     * @param amount Amount to deposit
-     * @return Detailed response of transaction
-     */
-    public EconomyResponse setPlayer(String playerName, double amount) {
-        balance.put(UUIDFetcher.getUUID(playerName), amount);
-        return new EconomyResponse(amount, getBalance(playerName), EconomyResponse.ResponseType.SUCCESS, null);
-    }
-
-    /**
-     * Set an amount to a player
-     *
-     * @param player to deposit to
-     * @param amount Amount to deposit
-     * @return Detailed response of transaction
-     */
-    public EconomyResponse setPlayer(OfflinePlayer player, double amount) {
-        balance.put(player.getUniqueId(), amount);
-        return new EconomyResponse(amount, getBalance(player), EconomyResponse.ResponseType.SUCCESS, null);
-    }
-
-    /**
      * @deprecated As of VaultAPI 1.4 use {{@link #createBank(String, OfflinePlayer)} instead.
      */
     @Deprecated
