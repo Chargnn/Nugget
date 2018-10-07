@@ -3,7 +3,11 @@ package com.chargnn.api;
 import com.chargnn.Main;
 import com.chargnn.service.BalanceService;
 import net.milkbowl.vault.economy.Economy;
+import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 
+import java.util.Map;
 import java.util.UUID;
 
 public class NGT {
@@ -22,7 +26,7 @@ public class NGT {
         if(!main.getConfig().contains("balance")) return;
 
         for(String uuid : main.getConfig().getConfigurationSection("balance").getKeys(false)){
-            econ.depositPlayer(NameFetcher.getName(uuid), main.getConfig().getDouble("balance." + UUID.fromString(uuid)));
+            econ.depositPlayer(NameFetcher.getName(uuid), main.getConfig().getDouble("balance." + uuid));
         }
     }
 }

@@ -12,10 +12,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.logging.Logger;
 
-/**
- * Hello world!
- *
- */
 public class Main extends JavaPlugin
 {
     private static final Logger log = Logger.getLogger("Server");
@@ -34,16 +30,18 @@ public class Main extends JavaPlugin
             return;
         }
 
-        getCommand("econ").setExecutor(new BalanceCommand(econ));
+        getCommand("econ").setExecutor(new BalanceCommand(econ, this));
         NGT.loadBalances(econ);
 
         Bukkit.getPluginManager().registerEvents(new PlayerListener(econ), this);
+
         log.info(String.format("[%s] Enabled Version %s", getDescription().getName(), getDescription().getVersion()));
     }
 
     @Override
     public void onDisable(){
         NGT.saveBalances();
+
         log.info(String.format("[%s] Disabled Version %s", getDescription().getName(), getDescription().getVersion()));
     }
 

@@ -145,7 +145,12 @@ public class BalanceService implements Economy {
     @Deprecated
     @Override
     public double getBalance(String playerName) {
-        return balance.get(UUIDFetcher.getUUID(playerName));
+        if(balance.containsKey(UUIDFetcher.getUUID(playerName))) {
+            return balance.get(UUIDFetcher.getUUID(playerName));
+        } else{
+            createPlayerAccount(playerName);
+            return balance.get(UUIDFetcher.getUUID(playerName));
+        }
     }
 
     /**
@@ -156,7 +161,12 @@ public class BalanceService implements Economy {
      */
     @Override
     public double getBalance(OfflinePlayer player) {
-        return balance.get(player.getUniqueId());
+        if(balance.containsKey(player.getUniqueId())) {
+            return balance.get(player.getUniqueId());
+        } else{
+            createPlayerAccount(player);
+            return balance.get(player.getUniqueId());
+        }
     }
 
     /**

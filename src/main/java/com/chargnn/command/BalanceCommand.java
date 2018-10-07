@@ -1,5 +1,6 @@
 package com.chargnn.command;
 
+import com.chargnn.Main;
 import com.chargnn.api.UUIDFetcher;
 import com.chargnn.service.BalanceService;
 import net.milkbowl.vault.economy.Economy;
@@ -10,10 +11,12 @@ import org.bukkit.command.CommandSender;
 
 public class BalanceCommand implements CommandExecutor {
 
+    private Main main;
     private Economy econ;
 
-    public BalanceCommand(Economy econ){
+    public BalanceCommand(Economy econ, Main main){
         this.econ = econ;
+        this.main = main;
     }
 
     @Override
@@ -52,12 +55,12 @@ public class BalanceCommand implements CommandExecutor {
                     try{
                         x = Double.parseDouble(strings[2]);
                     }catch(Exception e){
-                        invalidAmmount(commandSender);
+                        invalidAmount(commandSender);
                         return true;
                     }
 
                     if(x < 0){
-                        invalidAmmount(commandSender);
+                        invalidAmount(commandSender);
                         return true;
                     }
 
@@ -82,11 +85,11 @@ public class BalanceCommand implements CommandExecutor {
                     try{
                         x = Double.parseDouble(strings[2]);
                     }catch(Exception e){
-                        invalidAmmount(commandSender);
+                        invalidAmount(commandSender);
                         return true;
                     }
                     if(x < 0){
-                        invalidAmmount(commandSender);
+                        invalidAmount(commandSender);
                         return true;
                     }
 
@@ -115,10 +118,10 @@ public class BalanceCommand implements CommandExecutor {
     }
 
     private void sendUsage(CommandSender cs){
-        cs.sendMessage(ChatColor.RED + "Usage: /[set/add/clear] [player/balance] (amount)");
+        cs.sendMessage(ChatColor.RED + main.getCommand("econ").getUsage());
     }
 
-    private void invalidAmmount(CommandSender cs){
+    private void invalidAmount(CommandSender cs){
         cs.sendMessage(ChatColor.RED + "This is not a valid amount.");
     }
 }

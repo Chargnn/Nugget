@@ -5,4 +5,4 @@ depend: [Vault]
 commands:
   econ:
     description: "Econ commmand"
-    usage: /[set/add/clear] {player} (amount)
+    usage: /[set/add/clear] [player/balance] (amount)
