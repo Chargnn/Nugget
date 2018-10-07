@@ -21,7 +21,7 @@ public class NGT {
         if(!main.getConfig().contains("balance")) return;
 
         for(String uuid : main.getConfig().getConfigurationSection("balance").getKeys(false)){
-            service.set(UUID.fromString(uuid), main.getConfig().getDouble("balance." + UUID.fromString(uuid)));
+            service.setPlayer(NameFetcher.getName(uuid), main.getConfig().getDouble("balance." + UUID.fromString(uuid)));
         }
     }
 }

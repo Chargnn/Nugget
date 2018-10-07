@@ -7,8 +7,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import java.util.UUID;
-
 public class BalanceCommand implements CommandExecutor {
 
     private BalanceService service;
@@ -27,7 +25,7 @@ public class BalanceCommand implements CommandExecutor {
 
         switch (strings[0].toLowerCase()){
             case "balance":{
-                if(!service.hasBalance(UUIDFetcher.getUUID(commandSender.getName()))){
+                if(!service.hasAccount(commandSender.getName())){
                     noAccount(commandSender, commandSender.getName());
                     return true;
                 }
@@ -42,8 +40,7 @@ public class BalanceCommand implements CommandExecutor {
                 break;
                 }
             case "add":{
-                UUID playerUUID = UUIDFetcher.getUUID(strings[1]);
-                if(!service.hasBalance(playerUUID)){
+                if(!service.hasAccount(strings[1])){
                     noAccount(commandSender, strings[1]);
                     return true;
                 }
@@ -54,11 +51,16 @@ public class BalanceCommand implements CommandExecutor {
                     try{
                         x = Double.parseDouble(strings[2]);
                     }catch(Exception e){
-                        commandSender.sendMessage(ChatColor.RED + "This is not a valid ammount.");
+                        invalidAmmount(commandSender);
                         return true;
                     }
 
-                    service.add(playerUUID, x);
+                    if(x < 0){
+                        invalidAmmount(commandSender);
+                        return true;
+                    }
+
+                    service.depositPlayer(strings[1], x);
                     commandSender.sendMessage(ChatColor.GREEN + "Successfully added " + ChatColor.WHITE + x + "$" + ChatColor.GREEN + " to " + ChatColor.WHITE + strings[1] + ".");
                 } else {
                     sendUsage(commandSender);
@@ -68,8 +70,7 @@ public class BalanceCommand implements CommandExecutor {
                 break;
             }
             case "sub":{
-                UUID playerUUID = UUIDFetcher.getUUID(strings[1]);
-                if(!service.hasBalance(playerUUID)){
+                if(!service.hasAccount(strings[1])){
                     noAccount(commandSender, strings[1]);
                     return true;
                 }
@@ -80,13 +81,15 @@ public class BalanceCommand implements CommandExecutor {
                     try{
                         x = Double.parseDouble(strings[2]);
                     }catch(Exception e){
-                        commandSender.sendMessage(ChatColor.RED + "This is not a valid ammount.");
+                        invalidAmmount(commandSender);
                         return true;
                     }
-                    if(!(x < 0))
-                        x *= -1;
+                    if(x < 0){
+                        invalidAmmount(commandSender);
+                        return true;
+                    }
 
-                    service.add(playerUUID, x);
+                    service.withdrawPlayer(strings[1], x);
                     commandSender.sendMessage(ChatColor.GREEN + "Successfully removed " + ChatColor.WHITE + x + "$" + ChatColor.GREEN + " to " + ChatColor.WHITE + strings[1] + ".");
                 } else {
                     sendUsage(commandSender);
@@ -96,8 +99,7 @@ public class BalanceCommand implements CommandExecutor {
                 break;
             }
             case "set":{
-                UUID playerUUID = UUIDFetcher.getUUID(strings[1]);
-                if(!service.hasBalance(playerUUID)){
+                if(!service.hasAccount(strings[1])){
                     noAccount(commandSender, strings[1]);
                     return true;
                 }
@@ -108,11 +110,11 @@ public class BalanceCommand implements CommandExecutor {
                     try{
                         x = Double.parseDouble(strings[2]);
                     }catch(Exception e){
-                        commandSender.sendMessage(ChatColor.RED + "This is not a valid ammount.");
+                        invalidAmmount(commandSender);
                         return true;
                     }
 
-                    service.set(playerUUID, x);
+                    service.setPlayer(strings[1], x);
                     commandSender.sendMessage(ChatColor.GREEN + "Successfully set " + ChatColor.WHITE + x + "$" + ChatColor.GREEN + " to " + ChatColor.WHITE + strings[1] + ".");
                 } else {
                     sendUsage(commandSender);
@@ -122,15 +124,14 @@ public class BalanceCommand implements CommandExecutor {
                 break;
             }
             case "clear":{
-                UUID playerUUID = UUIDFetcher.getUUID(strings[1]);
-                if(!service.hasBalance(playerUUID)){
+                if(!service.hasAccount(strings[1])){
                     noAccount(commandSender, strings[1]);
                     return true;
                 }
 
                 if(strings.length == 2){
-                   service.clear(playerUUID);
-                    commandSender.sendMessage(ChatColor.GREEN + "Successfully cleared the account of " + ChatColor.WHITE + strings[1] + ".");
+                   service.setPlayer(strings[1], 0);
+                   commandSender.sendMessage(ChatColor.GREEN + "Successfully cleared the account of " + ChatColor.WHITE + strings[1] + ".");
                 } else {
                     sendUsage(commandSender);
                     return true;
@@ -149,11 +150,15 @@ public class BalanceCommand implements CommandExecutor {
 
     private void noAccount(CommandSender cs, String playerName){
         cs.sendMessage(ChatColor.RED + "Player " + playerName + " does not have an account.");
-        BalanceService.balance.put(UUIDFetcher.getUUID(playerName), 200d);
+        service.createPlayerAccount(playerName);
         cs.sendMessage(ChatColor.GREEN + "Account was created for " + playerName + ".");
     }
 
     private void sendUsage(CommandSender cs){
         cs.sendMessage(ChatColor.RED + "Usage: /[set/add/clear] [player/balance] (amount)");
+    }
+
+    private void invalidAmmount(CommandSender cs){
+        cs.sendMessage(ChatColor.RED + "This is not a valid amount.");
     }
 }
