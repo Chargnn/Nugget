@@ -7,6 +7,8 @@ public class ListenerMap<K, V> extends ListenerModel implements Map<K, V> {
     public static final String PROP_PUT = "put";
     public static final String REMOVE_PUT = "remove";
 
+    private int transactCount = 0;
+
     private Map<K, V> delegate = new LinkedHashMap<>();
 
     @Override
@@ -46,6 +48,7 @@ public class ListenerMap<K, V> extends ListenerModel implements Map<K, V> {
 
     @Override
     public V put(K key, V value) {
+        transactCount++;
         V oldValue = delegate.put(key, value);
         firePropertyChange(PROP_PUT, oldValue == null ? null : new AbstractMap.SimpleEntry<>(key, oldValue),
                 new AbstractMap.SimpleEntry<>(key, value));
@@ -73,5 +76,9 @@ public class ListenerMap<K, V> extends ListenerModel implements Map<K, V> {
     @Override
     public Collection<V> values() {
         return delegate.values();
+    }
+
+    public int getTransactCount() {
+        return transactCount;
     }
 }

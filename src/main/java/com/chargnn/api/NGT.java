@@ -24,6 +24,4 @@ public class NGT {
             service.set(UUID.fromString(uuid), main.getConfig().getDouble("balance." + UUID.fromString(uuid)));
         }
     }
-
-
 }

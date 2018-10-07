@@ -26,6 +26,21 @@ public class BalanceCommand implements CommandExecutor {
         }
 
         switch (strings[0].toLowerCase()){
+            case "balance":{
+                if(!service.hasBalance(UUIDFetcher.getUUID(commandSender.getName()))){
+                    noAccount(commandSender, commandSender.getName());
+                    return true;
+                }
+
+                if(strings.length == 1) {
+                    commandSender.sendMessage(ChatColor.GREEN + "Balance:" + ChatColor.WHITE + " " + BalanceService.balance.get(UUIDFetcher.getUUID(commandSender.getName())) + "$.");
+                } else {
+                    sendUsage(commandSender);
+                    return true;
+                }
+
+                break;
+                }
             case "add":{
                 UUID playerUUID = UUIDFetcher.getUUID(strings[1]);
                 if(!service.hasBalance(playerUUID)){
@@ -44,6 +59,7 @@ public class BalanceCommand implements CommandExecutor {
                     }
 
                     service.add(playerUUID, x);
+                    commandSender.sendMessage(ChatColor.GREEN + "Successfully added " + ChatColor.WHITE + x + "$" + ChatColor.GREEN + " to " + ChatColor.WHITE + strings[1] + ".");
                 } else {
                     sendUsage(commandSender);
                     return true;
@@ -67,8 +83,11 @@ public class BalanceCommand implements CommandExecutor {
                         commandSender.sendMessage(ChatColor.RED + "This is not a valid ammount.");
                         return true;
                     }
+                    if(!(x < 0))
+                        x *= -1;
 
-                    service.add(playerUUID, x*-1);
+                    service.add(playerUUID, x);
+                    commandSender.sendMessage(ChatColor.GREEN + "Successfully removed " + ChatColor.WHITE + x + "$" + ChatColor.GREEN + " to " + ChatColor.WHITE + strings[1] + ".");
                 } else {
                     sendUsage(commandSender);
                     return true;
@@ -94,6 +113,7 @@ public class BalanceCommand implements CommandExecutor {
                     }
 
                     service.set(playerUUID, x);
+                    commandSender.sendMessage(ChatColor.GREEN + "Successfully set " + ChatColor.WHITE + x + "$" + ChatColor.GREEN + " to " + ChatColor.WHITE + strings[1] + ".");
                 } else {
                     sendUsage(commandSender);
                     return true;
@@ -110,6 +130,7 @@ public class BalanceCommand implements CommandExecutor {
 
                 if(strings.length == 2){
                    service.clear(playerUUID);
+                    commandSender.sendMessage(ChatColor.GREEN + "Successfully cleared the account of " + ChatColor.WHITE + strings[1] + ".");
                 } else {
                     sendUsage(commandSender);
                     return true;
@@ -133,6 +154,6 @@ public class BalanceCommand implements CommandExecutor {
     }
 
     private void sendUsage(CommandSender cs){
-        cs.sendMessage(ChatColor.RED + "Usage: /[set/add/clear] {player} (amount)");
+        cs.sendMessage(ChatColor.RED + "Usage: /[set/add/clear] [player/balance] (amount)");
     }
 }
