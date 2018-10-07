@@ -15,7 +15,6 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e){
-
         if(!service.hasAccount(e.getPlayer().getName())) {
             service.setPlayer(e.getPlayer().getName(), 200d);
         }
