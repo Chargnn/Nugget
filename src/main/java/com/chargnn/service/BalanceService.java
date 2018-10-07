@@ -1,8 +1,6 @@
 package com.chargnn.service;
 
 import com.chargnn.Main;
-import com.chargnn.api.NGT;
-import com.chargnn.api.NameFetcher;
 import com.chargnn.api.UUIDFetcher;
 import com.chargnn.utils.ListenerMap;
 import net.milkbowl.vault.economy.Economy;

@@ -7,7 +7,10 @@ import com.chargnn.service.BalanceService;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
+import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.logging.Logger;
 
 /**
  * Hello world!
@@ -15,6 +18,7 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class Main extends JavaPlugin
 {
+    private static final Logger log = Logger.getLogger("Server");
     private BalanceService service;
     private Economy econ = null;
 
@@ -24,24 +28,37 @@ public class Main extends JavaPlugin
 
     @Override
     public void onEnable(){
-        getCommand("econ").setExecutor(new BalanceCommand(service));
-        NGT.loadBalances(service);
+        if (!setupEconomy() ) {
+            log.severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
 
-        Bukkit.getPluginManager().registerEvents(new PlayerListener(service), this);
+        getCommand("econ").setExecutor(new BalanceCommand(econ));
+        NGT.loadBalances(econ);
+
+        Bukkit.getPluginManager().registerEvents(new PlayerListener(econ), this);
+        log.info(String.format("[%s] Enabled Version %s", getDescription().getName(), getDescription().getVersion()));
     }
 
     @Override
     public void onDisable(){
         NGT.saveBalances();
+        log.info(String.format("[%s] Disabled Version %s", getDescription().getName(), getDescription().getVersion()));
     }
 
     private boolean setupEconomy()
     {
-        RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
-        if (economyProvider != null) {
-            econ = economyProvider.getProvider();
+        if (getServer().getPluginManager().getPlugin("Vault") == null) {
+            return false;
         }
 
-        return (econ != null);
+        Bukkit.getServer().getServicesManager().register(Economy.class, service, this, ServicePriority.Normal);
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        if (rsp == null) {
+            return false;
+        }
+        econ = rsp.getProvider();
+        return econ != null;
     }
 }

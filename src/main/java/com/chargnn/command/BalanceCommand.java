@@ -2,6 +2,7 @@ package com.chargnn.command;
 
 import com.chargnn.api.UUIDFetcher;
 import com.chargnn.service.BalanceService;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -9,10 +10,10 @@ import org.bukkit.command.CommandSender;
 
 public class BalanceCommand implements CommandExecutor {
 
-    private BalanceService service;
+    private Economy econ;
 
-    public BalanceCommand(BalanceService service){
-        this.service = service;
+    public BalanceCommand(Economy econ){
+        this.econ = econ;
     }
 
     @Override
@@ -25,7 +26,7 @@ public class BalanceCommand implements CommandExecutor {
 
         switch (strings[0].toLowerCase()){
             case "balance":{
-                if(!service.hasAccount(commandSender.getName())){
+                if(!econ.hasAccount(commandSender.getName())){
                     noAccount(commandSender, commandSender.getName());
                     return true;
                 }
@@ -40,7 +41,7 @@ public class BalanceCommand implements CommandExecutor {
                 break;
                 }
             case "add":{
-                if(!service.hasAccount(strings[1])){
+                if(!econ.hasAccount(strings[1])){
                     noAccount(commandSender, strings[1]);
                     return true;
                 }
@@ -60,7 +61,7 @@ public class BalanceCommand implements CommandExecutor {
                         return true;
                     }
 
-                    service.depositPlayer(strings[1], x);
+                    econ.depositPlayer(strings[1], x);
                     commandSender.sendMessage(ChatColor.GREEN + "Successfully added " + ChatColor.WHITE + x + "$" + ChatColor.GREEN + " to " + ChatColor.WHITE + strings[1] + ".");
                 } else {
                     sendUsage(commandSender);
@@ -70,7 +71,7 @@ public class BalanceCommand implements CommandExecutor {
                 break;
             }
             case "sub":{
-                if(!service.hasAccount(strings[1])){
+                if(!econ.hasAccount(strings[1])){
                     noAccount(commandSender, strings[1]);
                     return true;
                 }
@@ -89,49 +90,8 @@ public class BalanceCommand implements CommandExecutor {
                         return true;
                     }
 
-                    service.withdrawPlayer(strings[1], x);
+                    econ.withdrawPlayer(strings[1], x);
                     commandSender.sendMessage(ChatColor.GREEN + "Successfully removed " + ChatColor.WHITE + x + "$" + ChatColor.GREEN + " to " + ChatColor.WHITE + strings[1] + ".");
-                } else {
-                    sendUsage(commandSender);
-                    return true;
-                }
-
-                break;
-            }
-            case "set":{
-                if(!service.hasAccount(strings[1])){
-                    noAccount(commandSender, strings[1]);
-                    return true;
-                }
-
-                if(strings.length == 3){
-                    double x;
-
-                    try{
-                        x = Double.parseDouble(strings[2]);
-                    }catch(Exception e){
-                        invalidAmmount(commandSender);
-                        return true;
-                    }
-
-                    service.setPlayer(strings[1], x);
-                    commandSender.sendMessage(ChatColor.GREEN + "Successfully set " + ChatColor.WHITE + x + "$" + ChatColor.GREEN + " to " + ChatColor.WHITE + strings[1] + ".");
-                } else {
-                    sendUsage(commandSender);
-                    return true;
-                }
-
-                break;
-            }
-            case "clear":{
-                if(!service.hasAccount(strings[1])){
-                    noAccount(commandSender, strings[1]);
-                    return true;
-                }
-
-                if(strings.length == 2){
-                   service.setPlayer(strings[1], 0);
-                   commandSender.sendMessage(ChatColor.GREEN + "Successfully cleared the account of " + ChatColor.WHITE + strings[1] + ".");
                 } else {
                     sendUsage(commandSender);
                     return true;
@@ -150,7 +110,7 @@ public class BalanceCommand implements CommandExecutor {
 
     private void noAccount(CommandSender cs, String playerName){
         cs.sendMessage(ChatColor.RED + "Player " + playerName + " does not have an account.");
-        service.createPlayerAccount(playerName);
+        econ.createPlayerAccount(playerName);
         cs.sendMessage(ChatColor.GREEN + "Account was created for " + playerName + ".");
     }
 

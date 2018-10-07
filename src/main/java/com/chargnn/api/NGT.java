@@ -2,6 +2,7 @@ package com.chargnn.api;
 
 import com.chargnn.Main;
 import com.chargnn.service.BalanceService;
+import net.milkbowl.vault.economy.Economy;
 
 import java.util.UUID;
 
@@ -17,11 +18,11 @@ public class NGT {
         main.saveConfig();
     }
 
-    public static void loadBalances(BalanceService service){
+    public static void loadBalances(Economy econ){
         if(!main.getConfig().contains("balance")) return;
 
         for(String uuid : main.getConfig().getConfigurationSection("balance").getKeys(false)){
-            service.setPlayer(NameFetcher.getName(uuid), main.getConfig().getDouble("balance." + UUID.fromString(uuid)));
+            econ.depositPlayer(NameFetcher.getName(uuid), main.getConfig().getDouble("balance." + UUID.fromString(uuid)));
         }
     }
 }

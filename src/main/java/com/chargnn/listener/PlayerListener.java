@@ -1,22 +1,22 @@
 package com.chargnn.listener;
 
-import com.chargnn.service.BalanceService;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 public class PlayerListener implements Listener {
 
-    private BalanceService service;
+    private Economy econ;
 
-    public PlayerListener(BalanceService service){
-        this.service = service;
+    public PlayerListener(Economy econ){
+        this.econ = econ;
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e){
-        if(!service.hasAccount(e.getPlayer().getName())) {
-            service.setPlayer(e.getPlayer().getName(), 200d);
+        if(!econ.hasAccount(e.getPlayer().getName())) {
+            econ.createPlayerAccount(e.getPlayer().getName());
         }
     }
 
