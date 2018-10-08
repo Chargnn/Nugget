@@ -1,18 +1,18 @@
-package com.chargnn.api;
+package com.chargnn.utils.file;
 
 import com.chargnn.Main;
+import com.chargnn.api.NameFetcher;
 import com.chargnn.service.BalanceService;
-import com.chargnn.utils.file.AbstractYml;
 import net.milkbowl.vault.economy.Economy;
 
 import java.io.IOException;
 import java.util.UUID;
 
-public class NGT extends AbstractYml {
+public class YmlManager extends AbstractYml {
 
     private Economy econ = new BalanceService();
 
-    public NGT(Main main, String fileName) throws IOException {
+    public YmlManager(Main main, String fileName) throws IOException {
         super(main, fileName);
     }
 

@@ -1,9 +1,10 @@
 package com.chargnn;
 
-import com.chargnn.api.NGT;
+import com.chargnn.utils.file.YmlManager;
 import com.chargnn.command.BalanceCommand;
 import com.chargnn.listener.PlayerListener;
-import com.chargnn.utils.VaultHook;
+import com.chargnn.service.BalanceService;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.ServicesManager;
@@ -15,14 +16,10 @@ import java.util.logging.Logger;
 public class Main extends JavaPlugin
 {
     private static final Logger log = Logger.getLogger("Server");
-    public ServicesManager sm;
-    private VaultHook vaultHook;
-    private NGT balanceFile;
+    public ServicesManager sm = getServer().getServicesManager();
+    private YmlManager balanceFile = new YmlManager(this, "balance.yml");
 
-    public Main() {
-        sm = getServer().getServicesManager();
-        vaultHook = new VaultHook(this);
-    }
+    public Main() throws IOException {}
 
     @Override
     public void onEnable(){
@@ -31,14 +28,9 @@ public class Main extends JavaPlugin
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
-        try {
-            setupFiles();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        balanceFile.loadBalances();
 
         getCommand("econ").setExecutor(new BalanceCommand(this));
-
         Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
 
         log.info(String.format("[%s] Enabled Version %s", getDescription().getName(), getDescription().getVersion()));
@@ -53,17 +45,9 @@ public class Main extends JavaPlugin
 
     private boolean setupEconomy() {
         if (getServer().getPluginManager().getPlugin("Vault") != null) {
-            vaultHook.hook(ServicePriority.Highest);
-
+            sm.register(Economy.class, new BalanceService(), this, ServicePriority.Highest);
             return true;
         }
-
         return false;
-    }
-
-    private void setupFiles() throws IOException {
-        balanceFile = new NGT(this, "balance.yml");
-
-        balanceFile.loadBalances();
     }
 }

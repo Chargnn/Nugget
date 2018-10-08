@@ -29,13 +29,19 @@ public class BalanceCommand implements CommandExecutor {
 
         switch (strings[0].toLowerCase()){
             case "balance":{
-                if(!econ.hasAccount(commandSender.getName())){
-                    noAccount(commandSender, commandSender.getName());
-                    return true;
-                }
-
                 if(strings.length == 1) {
-                    commandSender.sendMessage(ChatColor.GREEN + "Balance:" + ChatColor.WHITE + " " + BalanceService.balance.get(UUIDFetcher.getUUID(commandSender.getName())) + "$.");
+                    if(!econ.hasAccount(commandSender.getName())){
+                        noAccount(commandSender, commandSender.getName(), false);
+                        return true;
+                    }
+
+                    commandSender.sendMessage(ChatColor.GREEN + "Balance:" + ChatColor.WHITE + " " +  econ.getBalance(commandSender.getName()) + "$.");
+                } else if(strings.length == 2){
+                    if(!econ.hasAccount(strings[1])){
+                        noAccount(commandSender, strings[1], false);
+                        return true;
+                    }
+                    commandSender.sendMessage(ChatColor.GREEN + "Balance of " + strings[1] + " :" + ChatColor.WHITE + " " + econ.getBalance(strings[1]) + "$.");
                 } else {
                     sendUsage(commandSender);
                     return true;
@@ -45,7 +51,7 @@ public class BalanceCommand implements CommandExecutor {
                 }
             case "add":{
                 if(!econ.hasAccount(strings[1])){
-                    noAccount(commandSender, strings[1]);
+                    noAccount(commandSender, strings[1], true);
                     return true;
                 }
 
@@ -75,7 +81,7 @@ public class BalanceCommand implements CommandExecutor {
             }
             case "sub":{
                 if(!econ.hasAccount(strings[1])){
-                    noAccount(commandSender, strings[1]);
+                    noAccount(commandSender, strings[1], true);
                     return true;
                 }
 
@@ -111,10 +117,12 @@ public class BalanceCommand implements CommandExecutor {
         return true;
     }
 
-    private void noAccount(CommandSender cs, String playerName){
+    private void noAccount(CommandSender cs, String playerName, boolean createAccount){
         cs.sendMessage(ChatColor.RED + "Player " + playerName + " does not have an account.");
-        econ.createPlayerAccount(playerName);
-        cs.sendMessage(ChatColor.GREEN + "Account was created for " + playerName + ".");
+        if(createAccount) {
+            econ.createPlayerAccount(playerName);
+            cs.sendMessage(ChatColor.GREEN + "Account was created for " + playerName + ".");
+        }
     }
 
     private void sendUsage(CommandSender cs){
