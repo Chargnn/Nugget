@@ -3,23 +3,25 @@ package com.chargnn;
 import com.chargnn.api.NGT;
 import com.chargnn.command.BalanceCommand;
 import com.chargnn.listener.PlayerListener;
-import com.chargnn.service.BalanceService;
-import net.milkbowl.vault.economy.Economy;
+import com.chargnn.utils.VaultHook;
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicePriority;
+import org.bukkit.plugin.ServicesManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.IOException;
 import java.util.logging.Logger;
 
 public class Main extends JavaPlugin
 {
     private static final Logger log = Logger.getLogger("Server");
-    private BalanceService service;
-    private Economy econ = null;
+    public ServicesManager sm;
+    private VaultHook vaultHook;
+    private NGT balanceFile;
 
-    public Main(){
-        service = new BalanceService(this);
+    public Main() {
+        sm = getServer().getServicesManager();
+        vaultHook = new VaultHook(this);
     }
 
     @Override
@@ -29,34 +31,39 @@ public class Main extends JavaPlugin
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
+        try {
+            setupFiles();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        getCommand("econ").setExecutor(new BalanceCommand(econ, this));
-        NGT.loadBalances(econ);
+        getCommand("econ").setExecutor(new BalanceCommand(this));
 
-        Bukkit.getPluginManager().registerEvents(new PlayerListener(econ), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
 
         log.info(String.format("[%s] Enabled Version %s", getDescription().getName(), getDescription().getVersion()));
     }
 
     @Override
     public void onDisable(){
-        NGT.saveBalances();
+        balanceFile.saveBalances();
 
         log.info(String.format("[%s] Disabled Version %s", getDescription().getName(), getDescription().getVersion()));
     }
 
-    private boolean setupEconomy()
-    {
-        if (getServer().getPluginManager().getPlugin("Vault") == null) {
-            return false;
+    private boolean setupEconomy() {
+        if (getServer().getPluginManager().getPlugin("Vault") != null) {
+            vaultHook.hook(ServicePriority.Highest);
+
+            return true;
         }
 
-        Bukkit.getServer().getServicesManager().register(Economy.class, service, this, ServicePriority.Normal);
-        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
-        if (rsp == null) {
-            return false;
-        }
-        econ = rsp.getProvider();
-        return econ != null;
+        return false;
+    }
+
+    private void setupFiles() throws IOException {
+        balanceFile = new NGT(this, "balance.yml");
+
+        balanceFile.loadBalances();
     }
 }

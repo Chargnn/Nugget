@@ -1,6 +1,5 @@
 package com.chargnn.service;
 
-import com.chargnn.Main;
 import com.chargnn.api.UUIDFetcher;
 import com.chargnn.utils.ListenerMap;
 import net.milkbowl.vault.economy.Economy;
@@ -13,13 +12,7 @@ import java.util.UUID;
 
 public class BalanceService implements Economy {
 
-    public static Main main;
     public static ListenerMap<UUID, Double> balance = new ListenerMap<>();
-
-    public BalanceService(Main main){
-        this.main = main;
-    }
-
 
     /**
      * Checks if economy method is enabled.
@@ -68,7 +61,9 @@ public class BalanceService implements Economy {
      */
     @Override
     public String format(double amount) {
-        return null;
+        amount = Math.ceil(amount);
+
+        return String.format("%d %s", (int)amount, "$");
     }
 
     /**
@@ -145,11 +140,10 @@ public class BalanceService implements Economy {
     @Deprecated
     @Override
     public double getBalance(String playerName) {
-        if(balance.containsKey(UUIDFetcher.getUUID(playerName))) {
+        if(hasAccount(playerName)) {
             return balance.get(UUIDFetcher.getUUID(playerName));
         } else{
-            createPlayerAccount(playerName);
-            return balance.get(UUIDFetcher.getUUID(playerName));
+            return 0;
         }
     }
 
@@ -161,11 +155,10 @@ public class BalanceService implements Economy {
      */
     @Override
     public double getBalance(OfflinePlayer player) {
-        if(balance.containsKey(player.getUniqueId())) {
+        if(hasAccount(player)) {
             return balance.get(player.getUniqueId());
         } else{
-            createPlayerAccount(player);
-            return balance.get(player.getUniqueId());
+            return 0;
         }
     }
 
@@ -196,9 +189,6 @@ public class BalanceService implements Economy {
     @Deprecated
     @Override
     public boolean has(String playerName, double amount) {
-        if(amount < 0)
-            amount *= -1;
-
         return getBalance(playerName) >= amount;
     }
 
@@ -211,9 +201,6 @@ public class BalanceService implements Economy {
      */
     @Override
     public boolean has(OfflinePlayer player, double amount) {
-        if(amount < 0)
-            amount *= -1;
-
         return getBalance(player) >= amount;
     }
 
@@ -252,11 +239,16 @@ public class BalanceService implements Economy {
     @Deprecated
     @Override
     public EconomyResponse withdrawPlayer(String playerName, double amount) {
+        System.out.println("CALL");
         if(amount < 0)
-            amount *= -1;
+            return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Cannot withdraw negative funds");
 
-        balance.put(UUIDFetcher.getUUID(playerName), getBalance(playerName) - amount);
-        return new EconomyResponse(amount, getBalance(playerName), EconomyResponse.ResponseType.SUCCESS, null);
+        if(getBalance(playerName) >= amount) {
+            balance.put(UUIDFetcher.getUUID(playerName), getBalance(playerName) - amount);
+            return new EconomyResponse(amount, getBalance(playerName), EconomyResponse.ResponseType.SUCCESS, null);
+        } else {
+            return new EconomyResponse(0, getBalance(playerName), EconomyResponse.ResponseType.FAILURE, "Insufficient funds");
+        }
     }
 
     /**
@@ -269,10 +261,14 @@ public class BalanceService implements Economy {
     @Override
     public EconomyResponse withdrawPlayer(OfflinePlayer player, double amount) {
         if(amount < 0)
-            amount *= -1;
+            return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Cannot withdraw negative funds");
 
-        balance.put(player.getUniqueId(), getBalance(player) - amount);
-        return new EconomyResponse(amount, getBalance(player), EconomyResponse.ResponseType.SUCCESS, null);
+        if(getBalance(player) >= amount) {
+            balance.put(player.getUniqueId(), getBalance(player) - amount);
+            return new EconomyResponse(amount, getBalance(player), EconomyResponse.ResponseType.SUCCESS, null);
+        } else {
+            return new EconomyResponse(0, getBalance(player), EconomyResponse.ResponseType.FAILURE, "Insufficient funds");
+        }
     }
 
     /**
@@ -304,7 +300,7 @@ public class BalanceService implements Economy {
     @Override
     public EconomyResponse depositPlayer(String playerName, double amount) {
         if(amount < 0)
-            amount *= -1;
+            return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Cannot withdraw negative funds");
 
         balance.put(UUIDFetcher.getUUID(playerName), getBalance(playerName) + amount);
         return new EconomyResponse(amount, getBalance(playerName), EconomyResponse.ResponseType.SUCCESS, null);
@@ -320,7 +316,7 @@ public class BalanceService implements Economy {
     @Override
     public EconomyResponse depositPlayer(OfflinePlayer player, double amount) {
         if(amount < 0)
-            amount *= -1;
+            return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Cannot withdraw negative funds");
 
         balance.put(player.getUniqueId(), getBalance(player) + amount);
         return new EconomyResponse(amount, getBalance(player), EconomyResponse.ResponseType.SUCCESS, null);
@@ -482,6 +478,9 @@ public class BalanceService implements Economy {
     @Deprecated
     @Override
     public boolean createPlayerAccount(String playerName) {
+        if(hasAccount(playerName))
+            return false;
+
         balance.put(UUIDFetcher.getUUID(playerName), 0d);
         return hasAccount(playerName);
     }
@@ -493,6 +492,9 @@ public class BalanceService implements Economy {
      */
     @Override
     public boolean createPlayerAccount(OfflinePlayer player) {
+        if(hasAccount(player))
+            return false;
+
         balance.put(player.getUniqueId(), 0d);
         return hasAccount(player);
     }

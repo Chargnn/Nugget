@@ -14,8 +14,8 @@ public class BalanceCommand implements CommandExecutor {
     private Main main;
     private Economy econ;
 
-    public BalanceCommand(Economy econ, Main main){
-        this.econ = econ;
+    public BalanceCommand(Main main){
+        this.econ = new BalanceService();
         this.main = main;
     }
 

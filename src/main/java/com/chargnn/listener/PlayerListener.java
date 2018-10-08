@@ -1,5 +1,6 @@
 package com.chargnn.listener;
 
+import com.chargnn.service.BalanceService;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -9,8 +10,8 @@ public class PlayerListener implements Listener {
 
     private Economy econ;
 
-    public PlayerListener(Economy econ){
-        this.econ = econ;
+    public PlayerListener(){
+        this.econ = new BalanceService();
     }
 
     @EventHandler
