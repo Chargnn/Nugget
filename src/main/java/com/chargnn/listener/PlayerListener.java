@@ -15,7 +15,7 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler
-    public void onJoin(PlayerJoinEvent e){
+    public void onPlayerJoin(PlayerJoinEvent e){
         if(!econ.hasAccount(e.getPlayer().getName())) {
             econ.createPlayerAccount(e.getPlayer().getName());
         }
