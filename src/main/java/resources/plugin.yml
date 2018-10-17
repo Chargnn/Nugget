@@ -1,8 +1,24 @@
 name: Nugget
-version: 1.0
+version: 1.1.2
 main:  com.chargnn.Main
 depend: [Vault]
+description: Another economy plugin
 commands:
-  econ:
-    description: "Econ commmand"
+  ngt:
+    description: Nugget base command
     usage: /[set/add/clear] [player/balance] (amount)
+permissions:
+  ngt.balance:
+    description: Use to see player's balance
+  ngt.balance.other:
+    description: Use to see other player's balance
+    default: op
+  ngt.balance.add:
+    description: Add an amount of money to a player
+    default: op
+  ngt.balance.sub:
+    description: Substract an amount of money from player
+    default: op
+  ngt.balance.set:
+    description: Set an amount of money to a player
+    default: op

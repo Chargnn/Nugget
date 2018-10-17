@@ -3,6 +3,7 @@ package com.chargnn.command;
 import com.chargnn.Main;
 import com.chargnn.api.UUIDFetcher;
 import com.chargnn.service.BalanceService;
+import com.chargnn.utils.Permissions;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -29,6 +30,11 @@ public class BalanceCommand implements CommandExecutor {
 
         switch (strings[0].toLowerCase()){
             case "balance":{
+                if(!commandSender.hasPermission(Permissions.BALANCE_CMD)){
+                    noPersmission(commandSender);
+                    return true;
+                }
+
                 if(strings.length == 1) {
                     if(!econ.hasAccount(commandSender.getName())){
                         noAccount(commandSender, commandSender.getName(), false);
@@ -36,20 +42,31 @@ public class BalanceCommand implements CommandExecutor {
                     }
 
                     commandSender.sendMessage(ChatColor.GREEN + "Balance:" + ChatColor.WHITE + " " +  econ.getBalance(commandSender.getName()) + "$.");
+                    return true;
                 } else if(strings.length == 2){
                     if(!econ.hasAccount(strings[1])){
                         noAccount(commandSender, strings[1], false);
                         return true;
                     }
+
+                    if(!commandSender.hasPermission(Permissions.BALANCE_OTHER_CMD)){
+                        noPersmission(commandSender);
+                        return true;
+                    }
+
                     commandSender.sendMessage(ChatColor.GREEN + "Balance of " + strings[1] + " :" + ChatColor.WHITE + " " + econ.getBalance(strings[1]) + "$.");
+                    return true;
                 } else {
                     sendUsage(commandSender);
                     return true;
                 }
-
-                break;
-                }
+            }
             case "add":{
+                if(!commandSender.hasPermission(Permissions.BALANCE_ADD_CMD)){
+                    noPersmission(commandSender);
+                    return true;
+                }
+
                 if(!econ.hasAccount(strings[1])){
                     noAccount(commandSender, strings[1], true);
                     return true;
@@ -72,14 +89,18 @@ public class BalanceCommand implements CommandExecutor {
 
                     econ.depositPlayer(strings[1], x);
                     commandSender.sendMessage(ChatColor.GREEN + "Successfully added " + ChatColor.WHITE + x + "$" + ChatColor.GREEN + " to " + ChatColor.WHITE + strings[1] + ".");
+                    return true;
                 } else {
                     sendUsage(commandSender);
                     return true;
                 }
-
-                break;
             }
             case "sub":{
+                if(!commandSender.hasPermission(Permissions.BALANCE_SUB_CMD)){
+                    noPersmission(commandSender);
+                    return true;
+                }
+
                 if(!econ.hasAccount(strings[1])){
                     noAccount(commandSender, strings[1], true);
                     return true;
@@ -101,20 +122,51 @@ public class BalanceCommand implements CommandExecutor {
 
                     econ.withdrawPlayer(strings[1], x);
                     commandSender.sendMessage(ChatColor.GREEN + "Successfully removed " + ChatColor.WHITE + x + "$" + ChatColor.GREEN + " to " + ChatColor.WHITE + strings[1] + ".");
+                    return true;
                 } else {
                     sendUsage(commandSender);
                     return true;
                 }
+            }
+            case "set":{
+                if(!commandSender.hasPermission(Permissions.BALANCE_SET_CMD)){
+                    noPersmission(commandSender);
+                    return true;
+                }
 
-                break;
+                if(!econ.hasAccount(strings[1])){
+                    noAccount(commandSender, strings[1], true);
+                    return true;
+                }
+
+                if(strings.length == 3){
+                    double x;
+
+                    try{
+                        x = Double.parseDouble(strings[2]);
+                    }catch(Exception e){
+                        invalidAmount(commandSender);
+                        return true;
+                    }
+                    if(x < 0){
+                        invalidAmount(commandSender);
+                        return true;
+                    }
+
+                    econ.withdrawPlayer(strings[1], econ.getBalance(strings[1]));
+                    econ.depositPlayer(strings[1], x);
+                    commandSender.sendMessage(ChatColor.GREEN + "Successfully set " + ChatColor.WHITE + x + "$" + ChatColor.GREEN + " to " + ChatColor.WHITE + strings[1] + ".");
+                    return true;
+                } else {
+                    sendUsage(commandSender);
+                    return true;
+                }
             }
             default:{
                 sendUsage(commandSender);
-                break;
+                return true;
             }
         }
-
-        return true;
     }
 
     private void noAccount(CommandSender cs, String playerName, boolean createAccount){
@@ -125,8 +177,12 @@ public class BalanceCommand implements CommandExecutor {
         }
     }
 
+    private void noPersmission(CommandSender cs){
+        cs.sendMessage(ChatColor.RED + "You don't have enough permission for that command!");
+    }
+
     private void sendUsage(CommandSender cs){
-        cs.sendMessage(ChatColor.RED + main.getCommand("econ").getUsage());
+        cs.sendMessage(ChatColor.RED + main.getCommand("ngt").getUsage());
     }
 
     private void invalidAmount(CommandSender cs){

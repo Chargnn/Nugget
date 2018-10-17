@@ -10,8 +10,8 @@ import java.io.IOException;
 public class AbstractYml {
 
     public static Main main;
-    private String fileName;
-    private File file;
+    protected String fileName;
+    protected File file;
     protected FileConfiguration fileConfiguration;
 
     public AbstractYml(Main main, String fileName) throws IOException {

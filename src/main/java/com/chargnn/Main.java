@@ -1,6 +1,6 @@
 package com.chargnn;
 
-import com.chargnn.utils.file.YmlManager;
+import com.chargnn.utils.file.BalanceFileManager;
 import com.chargnn.command.BalanceCommand;
 import com.chargnn.listener.PlayerListener;
 import com.chargnn.service.BalanceService;
@@ -17,7 +17,7 @@ public class Main extends JavaPlugin
 {
     private static final Logger log = Logger.getLogger("Server");
     public ServicesManager sm = getServer().getServicesManager();
-    private YmlManager balanceFile = new YmlManager(this, "balance.yml");
+    private BalanceFileManager balanceFile = new BalanceFileManager(this, "balance.yml");
 
     public Main() throws IOException {}
 
@@ -28,9 +28,10 @@ public class Main extends JavaPlugin
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
+
         balanceFile.loadBalances();
 
-        getCommand("econ").setExecutor(new BalanceCommand(this));
+        getCommand("ngt").setExecutor(new BalanceCommand(this));
         Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
 
         log.info(String.format("[%s] Enabled Version %s", getDescription().getName(), getDescription().getVersion()));
@@ -38,7 +39,11 @@ public class Main extends JavaPlugin
 
     @Override
     public void onDisable(){
-        balanceFile.saveBalances();
+        try {
+            balanceFile.saveBalances();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         log.info(String.format("[%s] Disabled Version %s", getDescription().getName(), getDescription().getVersion()));
     }

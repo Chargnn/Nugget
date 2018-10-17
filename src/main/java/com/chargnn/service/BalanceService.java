@@ -92,7 +92,6 @@ public class BalanceService implements Economy {
      *
      * @deprecated As of VaultAPI 1.4 use {@link #hasAccount(OfflinePlayer)} instead.
      */
-    @Deprecated
     @Override
     public boolean hasAccount(String playerName) {
         return balance.containsKey(UUIDFetcher.getUUID(playerName));
@@ -114,7 +113,6 @@ public class BalanceService implements Economy {
     /**
      * @deprecated As of VaultAPI 1.4 use {@link #hasAccount(OfflinePlayer, String)} instead.
      */
-    @Deprecated
     @Override
     public boolean hasAccount(String playerName, String worldName) {
         return hasAccount(playerName);
@@ -137,7 +135,6 @@ public class BalanceService implements Economy {
     /**
      * @deprecated As of VaultAPI 1.4 use {@link #getBalance(OfflinePlayer)} instead.
      */
-    @Deprecated
     @Override
     public double getBalance(String playerName) {
         if(hasAccount(playerName)) {
@@ -165,7 +162,6 @@ public class BalanceService implements Economy {
     /**
      * @deprecated As of VaultAPI 1.4 use {@link #getBalance(OfflinePlayer, String)} instead.
      */
-    @Deprecated
     @Override
     public double getBalance(String playerName, String worldName) {
         return getBalance(playerName);
@@ -186,7 +182,6 @@ public class BalanceService implements Economy {
     /**
      * @deprecated As of VaultAPI 1.4 use {@link #has(OfflinePlayer, double)} instead.
      */
-    @Deprecated
     @Override
     public boolean has(String playerName, double amount) {
         return getBalance(playerName) >= amount;
@@ -207,7 +202,6 @@ public class BalanceService implements Economy {
     /**
      * @deprecated As of VaultAPI 1.4 use @{link {@link #has(OfflinePlayer, String, double)} instead.
      */
-    @Deprecated
     @Override
     public boolean has(String playerName, String world, double amount) {
         if(amount < 0)
@@ -236,7 +230,6 @@ public class BalanceService implements Economy {
     /**
      * @deprecated As of VaultAPI 1.4 use {@link #withdrawPlayer(OfflinePlayer, double)} instead.
      */
-    @Deprecated
     @Override
     public EconomyResponse withdrawPlayer(String playerName, double amount) {
         System.out.println("CALL");
@@ -274,7 +267,6 @@ public class BalanceService implements Economy {
     /**
      * @deprecated As of VaultAPI 1.4 use {@link #withdrawPlayer(OfflinePlayer, String, double)} instead.
      */
-    @Deprecated
     @Override
     public EconomyResponse withdrawPlayer(String playerName, String worldName, double amount) {
         return withdrawPlayer(playerName, amount);
@@ -296,7 +288,6 @@ public class BalanceService implements Economy {
     /**
      * @deprecated As of VaultAPI 1.4 use {@link #depositPlayer(OfflinePlayer, double)} instead.
      */
-    @Deprecated
     @Override
     public EconomyResponse depositPlayer(String playerName, double amount) {
         if(amount < 0)
@@ -325,7 +316,6 @@ public class BalanceService implements Economy {
     /**
      * @deprecated As of VaultAPI 1.4 use {@link #depositPlayer(OfflinePlayer, String, double)} instead.
      */
-    @Deprecated
     @Override
     public EconomyResponse depositPlayer(String playerName, String worldName, double amount) {
         return depositPlayer(playerName, amount);
@@ -348,7 +338,6 @@ public class BalanceService implements Economy {
     /**
      * @deprecated As of VaultAPI 1.4 use {{@link #createBank(String, OfflinePlayer)} instead.
      */
-    @Deprecated
     @Override
     public EconomyResponse createBank(String playerName, String s1) {
         throw new NotImplementedException();
@@ -424,7 +413,6 @@ public class BalanceService implements Economy {
     /**
      * @deprecated As of VaultAPI 1.4 use {{@link #isBankOwner(String, OfflinePlayer)} instead.
      */
-    @Deprecated
     @Override
     public EconomyResponse isBankOwner(String name, String playerName) {
         throw new NotImplementedException();
@@ -445,7 +433,6 @@ public class BalanceService implements Economy {
     /**
      * @deprecated As of VaultAPI 1.4 use {{@link #isBankMember(String, OfflinePlayer)} instead.
      */
-    @Deprecated
     @Override
     public EconomyResponse isBankMember(String name, String playerName) {
         throw new NotImplementedException();
@@ -475,7 +462,6 @@ public class BalanceService implements Economy {
     /**
      * @deprecated As of VaultAPI 1.4 use {{@link #createPlayerAccount(OfflinePlayer)} instead.
      */
-    @Deprecated
     @Override
     public boolean createPlayerAccount(String playerName) {
         if(hasAccount(playerName))
@@ -502,7 +488,6 @@ public class BalanceService implements Economy {
     /**
      * @deprecated As of VaultAPI 1.4 use {{@link #createPlayerAccount(OfflinePlayer, String)} instead.
      */
-    @Deprecated
     @Override
     public boolean createPlayerAccount(String playerName, String worldName) {
         return createPlayerAccount(playerName);
