@@ -2,6 +2,7 @@ package com.chargnn.service;
 
 import com.chargnn.api.UUIDFetcher;
 import com.chargnn.utils.ListenerMap;
+import com.chargnn.utils.file.ConfigManager;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.OfflinePlayer;
@@ -29,7 +30,7 @@ public class BalanceService implements Economy {
      */
     @Override
     public String getName() {
-        return "econ";
+        return "nugget";
     }
 
     /**
@@ -49,7 +50,7 @@ public class BalanceService implements Economy {
      */
     @Override
     public int fractionalDigits() {
-        return 2;
+        return ConfigManager.getFractionalDigits();
     }
 
     /**
@@ -74,7 +75,7 @@ public class BalanceService implements Economy {
      */
     @Override
     public String currencyNamePlural() {
-        return "dollars";
+        return ConfigManager.getCurrencyNamePlural();
     }
 
     /**
@@ -85,7 +86,7 @@ public class BalanceService implements Economy {
      */
     @Override
     public String currencyNameSingular() {
-        return "dollars";
+        return ConfigManager.getCurrencyNameSingular();
     }
 
     /**
@@ -467,7 +468,7 @@ public class BalanceService implements Economy {
         if(hasAccount(playerName))
             return false;
 
-        balance.put(UUIDFetcher.getUUID(playerName), 0d);
+        balance.put(UUIDFetcher.getUUID(playerName), (double) ConfigManager.getInitial());
         return hasAccount(playerName);
     }
 
@@ -481,7 +482,7 @@ public class BalanceService implements Economy {
         if(hasAccount(player))
             return false;
 
-        balance.put(player.getUniqueId(), 0d);
+        balance.put(player.getUniqueId(), (double) ConfigManager.getInitial());
         return hasAccount(player);
     }
 

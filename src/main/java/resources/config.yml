@@ -1,0 +1,15 @@
+#config v1.0
+
+balance:
+  #initial amount on creating a new account for player.
+  initial: 0
+
+currency:
+  #name of the currency in plural form. You CAN use color codes.
+  currencyNamePlural: 'dollars'
+
+  #name of the currency in singular form. You CAN use color codes.
+  currencyNameSingular: 'dollar'
+
+  #number of digits after the decimal point kept.
+  fractionalDigits: 2

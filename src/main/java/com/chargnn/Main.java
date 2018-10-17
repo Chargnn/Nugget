@@ -4,6 +4,7 @@ import com.chargnn.utils.file.BalanceFileManager;
 import com.chargnn.command.BalanceCommand;
 import com.chargnn.listener.PlayerListener;
 import com.chargnn.service.BalanceService;
+import com.chargnn.utils.file.ConfigManager;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.ServicePriority;
@@ -15,11 +16,14 @@ import java.util.logging.Logger;
 
 public class Main extends JavaPlugin
 {
-    private static final Logger log = Logger.getLogger("Server");
+    private static final Logger log = Logger.getLogger("Nugget");
     public ServicesManager sm = getServer().getServicesManager();
     private BalanceFileManager balanceFile = new BalanceFileManager(this, "balance.yml");
+    private ConfigManager configManager;
 
-    public Main() throws IOException {}
+    public Main() throws IOException {
+        configManager = new ConfigManager(this);
+    }
 
     @Override
     public void onEnable(){
@@ -29,6 +33,7 @@ public class Main extends JavaPlugin
             return;
         }
 
+        configManager.setup();
         balanceFile.loadBalances();
 
         getCommand("ngt").setExecutor(new BalanceCommand(this));
@@ -55,4 +60,5 @@ public class Main extends JavaPlugin
         }
         return false;
     }
+
 }

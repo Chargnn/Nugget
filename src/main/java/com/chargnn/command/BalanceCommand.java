@@ -4,6 +4,7 @@ import com.chargnn.Main;
 import com.chargnn.api.UUIDFetcher;
 import com.chargnn.service.BalanceService;
 import com.chargnn.utils.Permissions;
+import com.chargnn.utils.file.ConfigManager;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -41,7 +42,7 @@ public class BalanceCommand implements CommandExecutor {
                         return true;
                     }
 
-                    commandSender.sendMessage(ChatColor.GREEN + "Balance:" + ChatColor.WHITE + " " +  econ.getBalance(commandSender.getName()) + "$.");
+                    commandSender.sendMessage(ChatColor.GREEN + "Balance:" + ChatColor.WHITE + " " +  econ.getBalance(commandSender.getName()) + " " + (econ.getBalance(commandSender.getName()) > 1 ? ConfigManager.getCurrencyNamePlural() : ConfigManager.getCurrencyNameSingular()) + ".");
                     return true;
                 } else if(strings.length == 2){
                     if(!econ.hasAccount(strings[1])){
@@ -54,7 +55,7 @@ public class BalanceCommand implements CommandExecutor {
                         return true;
                     }
 
-                    commandSender.sendMessage(ChatColor.GREEN + "Balance of " + strings[1] + " :" + ChatColor.WHITE + " " + econ.getBalance(strings[1]) + "$.");
+                    commandSender.sendMessage(ChatColor.GREEN + "Balance of " + strings[1] + " :" + ChatColor.WHITE + " " + econ.getBalance(strings[1]) + " " + (econ.getBalance(commandSender.getName()) > 1 ? ConfigManager.getCurrencyNamePlural() : ConfigManager.getCurrencyNameSingular()) + ".");
                     return true;
                 } else {
                     sendUsage(commandSender);
@@ -88,7 +89,7 @@ public class BalanceCommand implements CommandExecutor {
                     }
 
                     econ.depositPlayer(strings[1], x);
-                    commandSender.sendMessage(ChatColor.GREEN + "Successfully added " + ChatColor.WHITE + x + "$" + ChatColor.GREEN + " to " + ChatColor.WHITE + strings[1] + ".");
+                    commandSender.sendMessage(ChatColor.GREEN + "Successfully added " + ChatColor.WHITE + x + " " + (x > 1 ? ConfigManager.getCurrencyNamePlural() : ConfigManager.getCurrencyNameSingular()) + ChatColor.GREEN + " to " + ChatColor.WHITE + strings[1] + ".");
                     return true;
                 } else {
                     sendUsage(commandSender);
@@ -121,7 +122,7 @@ public class BalanceCommand implements CommandExecutor {
                     }
 
                     econ.withdrawPlayer(strings[1], x);
-                    commandSender.sendMessage(ChatColor.GREEN + "Successfully removed " + ChatColor.WHITE + x + "$" + ChatColor.GREEN + " to " + ChatColor.WHITE + strings[1] + ".");
+                    commandSender.sendMessage(ChatColor.GREEN + "Successfully removed " + ChatColor.WHITE + x + " " + (x > 1 ? ConfigManager.getCurrencyNamePlural() : ConfigManager.getCurrencyNameSingular()) + ChatColor.GREEN + " to " + ChatColor.WHITE + strings[1] + ".");
                     return true;
                 } else {
                     sendUsage(commandSender);
@@ -155,7 +156,7 @@ public class BalanceCommand implements CommandExecutor {
 
                     econ.withdrawPlayer(strings[1], econ.getBalance(strings[1]));
                     econ.depositPlayer(strings[1], x);
-                    commandSender.sendMessage(ChatColor.GREEN + "Successfully set " + ChatColor.WHITE + x + "$" + ChatColor.GREEN + " to " + ChatColor.WHITE + strings[1] + ".");
+                    commandSender.sendMessage(ChatColor.GREEN + "Successfully set " + ChatColor.WHITE + x + " " + (x > 1 ? ConfigManager.getCurrencyNamePlural() : ConfigManager.getCurrencyNameSingular()) + ChatColor.GREEN + " to " + ChatColor.WHITE + strings[1] + ".");
                     return true;
                 } else {
                     sendUsage(commandSender);
