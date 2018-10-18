@@ -2,7 +2,7 @@ package com.chargnn.utils;
 
 public class Permissions {
 
-    public static final String BALANCE_CMD = "ngt.balance";
+    public static final String BALANCE_CMD = "ngt.balances";
     public static final String BALANCE_OTHER_CMD = BALANCE_CMD + ".other";
 
     public static final String BALANCE_ADD_CMD = BALANCE_CMD + ".add";

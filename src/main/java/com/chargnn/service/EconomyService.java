@@ -1,19 +1,23 @@
 package com.chargnn.service;
 
+import com.chargnn.api.NameFetcher;
 import com.chargnn.api.UUIDFetcher;
+import com.chargnn.model.Balance;
+import com.chargnn.model.Bank;
 import com.chargnn.utils.ListenerMap;
 import com.chargnn.utils.file.ConfigManager;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.OfflinePlayer;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class BalanceService implements Economy {
+public class EconomyService implements Economy {
 
-    public static ListenerMap<UUID, Double> balance = new ListenerMap<>();
+    public static ListenerMap<UUID, Balance> balances = new ListenerMap<>();
+    public static List<Bank> banks = new ArrayList<>();
 
     /**
      * Checks if economy method is enabled.
@@ -39,7 +43,7 @@ public class BalanceService implements Economy {
      */
     @Override
     public boolean hasBankSupport() {
-        return false;
+        return true;
     }
 
     /**
@@ -95,7 +99,7 @@ public class BalanceService implements Economy {
      */
     @Override
     public boolean hasAccount(String playerName) {
-        return balance.containsKey(UUIDFetcher.getUUID(playerName));
+        return balances.containsKey(UUIDFetcher.getUUID(playerName));
     }
 
     /**
@@ -108,7 +112,7 @@ public class BalanceService implements Economy {
      */
     @Override
     public boolean hasAccount(OfflinePlayer player) {
-        return balance.containsKey(player.getUniqueId());
+        return balances.containsKey(player.getUniqueId());
     }
 
     /**
@@ -139,14 +143,14 @@ public class BalanceService implements Economy {
     @Override
     public double getBalance(String playerName) {
         if(hasAccount(playerName)) {
-            return balance.get(UUIDFetcher.getUUID(playerName));
+            return balances.get(UUIDFetcher.getUUID(playerName)).amount;
         } else{
             return 0;
         }
     }
 
     /**
-     * Gets balance of a player
+     * Gets balances of a player
      *
      * @param player of the player
      * @return Amount currently held in players account
@@ -154,7 +158,7 @@ public class BalanceService implements Economy {
     @Override
     public double getBalance(OfflinePlayer player) {
         if(hasAccount(player)) {
-            return balance.get(player.getUniqueId());
+            return balances.get(player.getUniqueId()).amount;
         } else{
             return 0;
         }
@@ -169,8 +173,8 @@ public class BalanceService implements Economy {
     }
 
     /**
-     * Gets balance of a player on the specified world.
-     * IMPLEMENTATION SPECIFIC - if an economy plugin does not support this the global balance will be returned.
+     * Gets balances of a player on the specified world.
+     * IMPLEMENTATION SPECIFIC - if an economy plugin does not support this the global balances will be returned.
      * @param player to check
      * @param world name of the world
      * @return Amount currently held in players account
@@ -213,7 +217,7 @@ public class BalanceService implements Economy {
 
     /**
      * Checks if the player account has the amount in a given world - DO NOT USE NEGATIVE AMOUNTS
-     * IMPLEMENTATION SPECIFIC - if an economy plugin does not support this the global balance will be returned.
+     * IMPLEMENTATION SPECIFIC - if an economy plugin does not support this the global balances will be returned.
      *
      * @param player to check
      * @param worldName to check with
@@ -233,12 +237,11 @@ public class BalanceService implements Economy {
      */
     @Override
     public EconomyResponse withdrawPlayer(String playerName, double amount) {
-        System.out.println("CALL");
         if(amount < 0)
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Cannot withdraw negative funds");
 
         if(getBalance(playerName) >= amount) {
-            balance.put(UUIDFetcher.getUUID(playerName), getBalance(playerName) - amount);
+            balances.put(UUIDFetcher.getUUID(playerName), new Balance(getBalance(playerName) - amount));
             return new EconomyResponse(amount, getBalance(playerName), EconomyResponse.ResponseType.SUCCESS, null);
         } else {
             return new EconomyResponse(0, getBalance(playerName), EconomyResponse.ResponseType.FAILURE, "Insufficient funds");
@@ -258,7 +261,7 @@ public class BalanceService implements Economy {
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Cannot withdraw negative funds");
 
         if(getBalance(player) >= amount) {
-            balance.put(player.getUniqueId(), getBalance(player) - amount);
+            balances.put(player.getUniqueId(), new Balance(getBalance(player) - amount));
             return new EconomyResponse(amount, getBalance(player), EconomyResponse.ResponseType.SUCCESS, null);
         } else {
             return new EconomyResponse(0, getBalance(player), EconomyResponse.ResponseType.FAILURE, "Insufficient funds");
@@ -275,7 +278,7 @@ public class BalanceService implements Economy {
 
     /**
      * Withdraw an amount from a player on a given world - DO NOT USE NEGATIVE AMOUNTS
-     * IMPLEMENTATION SPECIFIC - if an economy plugin does not support this the global balance will be returned.
+     * IMPLEMENTATION SPECIFIC - if an economy plugin does not support this the global balances will be returned.
      * @param player to withdraw from
      * @param worldName - name of the world
      * @param amount Amount to withdraw
@@ -294,7 +297,7 @@ public class BalanceService implements Economy {
         if(amount < 0)
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Cannot withdraw negative funds");
 
-        balance.put(UUIDFetcher.getUUID(playerName), getBalance(playerName) + amount);
+        balances.put(UUIDFetcher.getUUID(playerName), new Balance(getBalance(playerName) + amount));
         return new EconomyResponse(amount, getBalance(playerName), EconomyResponse.ResponseType.SUCCESS, null);
     }
 
@@ -310,7 +313,7 @@ public class BalanceService implements Economy {
         if(amount < 0)
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Cannot withdraw negative funds");
 
-        balance.put(player.getUniqueId(), getBalance(player) + amount);
+        balances.put(player.getUniqueId(), new Balance(getBalance(player) + amount));
         return new EconomyResponse(amount, getBalance(player), EconomyResponse.ResponseType.SUCCESS, null);
     }
 
@@ -324,7 +327,7 @@ public class BalanceService implements Economy {
 
     /**
      * Deposit an amount to a player - DO NOT USE NEGATIVE AMOUNTS
-     * IMPLEMENTATION SPECIFIC - if an economy plugin does not support this the global balance will be returned.
+     * IMPLEMENTATION SPECIFIC - if an economy plugin does not support this the global balances will be returned.
      *
      * @param player to deposit to
      * @param worldName name of the world
@@ -340,8 +343,14 @@ public class BalanceService implements Economy {
      * @deprecated As of VaultAPI 1.4 use {{@link #createBank(String, OfflinePlayer)} instead.
      */
     @Override
-    public EconomyResponse createBank(String playerName, String s1) {
-        throw new NotImplementedException();
+    public EconomyResponse createBank(String name, String owner) {
+        Bank bank = new Bank(name, UUIDFetcher.getUUID(owner));
+        if(!banks.contains(bank)) {
+            banks.add(bank);
+            return new EconomyResponse(0, 0, EconomyResponse.ResponseType.SUCCESS, null);
+        } else {
+            return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Bank with that name already exists");
+        }
     }
 
     /**
@@ -352,7 +361,13 @@ public class BalanceService implements Economy {
      */
     @Override
     public EconomyResponse createBank(String name, OfflinePlayer player) {
-        throw new NotImplementedException();
+        Bank bank = new Bank(name, player.getUniqueId());
+        if(!banks.contains(bank)) {
+            banks.add(bank);
+            return new EconomyResponse(0, 0, EconomyResponse.ResponseType.SUCCESS, null);
+        } else {
+            return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Bank with that name already exists");
+        }
     }
 
     /**
@@ -362,7 +377,14 @@ public class BalanceService implements Economy {
      */
     @Override
     public EconomyResponse deleteBank(String name) {
-        throw new NotImplementedException();
+        for(Bank bank : banks) {
+            if (bank.name.equals(name)) {
+                banks.remove(bank);
+                return new EconomyResponse(0, 0, EconomyResponse.ResponseType.SUCCESS, null);
+            }
+        }
+
+        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Bank not found");
     }
 
     /**
@@ -372,7 +394,13 @@ public class BalanceService implements Economy {
      */
     @Override
     public EconomyResponse bankBalance(String name) {
-        throw new NotImplementedException();
+        for(Bank bank : banks) {
+            if (bank.name.equals(name)) {
+                return new EconomyResponse(0, bank.balance.amount, EconomyResponse.ResponseType.SUCCESS, null);
+            }
+        }
+
+        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Bank not found");
     }
 
     /**
@@ -384,7 +412,20 @@ public class BalanceService implements Economy {
      */
     @Override
     public EconomyResponse bankHas(String name, double amount) {
-        throw new NotImplementedException();
+        if(amount < 0)
+            return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Cannot withdraw negative funds");
+
+        for(Bank bank : banks) {
+            if (bank.name.equals(name)) {
+                if(bank.balance.amount >= amount) {
+                    return new EconomyResponse(amount, bank.balance.amount, EconomyResponse.ResponseType.SUCCESS, null);
+                } else {
+                    return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Insufficient funds");
+                }
+            }
+        }
+
+        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Bank not found");
     }
 
     /**
@@ -396,7 +437,21 @@ public class BalanceService implements Economy {
      */
     @Override
     public EconomyResponse bankWithdraw(String name, double amount) {
-        throw new NotImplementedException();
+        if(amount < 0)
+            return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Cannot withdraw negative funds");
+
+        for(Bank bank : banks) {
+            if (bank.name.equals(name)) {
+                if(bankHas(bank.name, amount).transactionSuccess()) {
+                    bank.balance.amount -= amount;
+                    return new EconomyResponse(amount, bank.balance.amount, EconomyResponse.ResponseType.SUCCESS, null);
+                } else {
+                    return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Insufficient funds");
+                }
+            }
+        }
+
+        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Bank not found");
     }
 
     /**
@@ -408,7 +463,21 @@ public class BalanceService implements Economy {
      */
     @Override
     public EconomyResponse bankDeposit(String name, double amount) {
-        throw new NotImplementedException();
+        if(amount < 0)
+            return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Cannot withdraw negative funds");
+
+        for(Bank bank : banks) {
+            if (bank.name.equals(name)) {
+                if(bankHas(bank.name, amount).transactionSuccess()) {
+                    bank.balance.amount += amount;
+                    return new EconomyResponse(amount, bank.balance.amount, EconomyResponse.ResponseType.SUCCESS, null);
+                } else {
+                    return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Insufficient funds");
+                }
+            }
+        }
+
+        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Bank not found");
     }
 
     /**
@@ -416,7 +485,17 @@ public class BalanceService implements Economy {
      */
     @Override
     public EconomyResponse isBankOwner(String name, String playerName) {
-        throw new NotImplementedException();
+        for(Bank bank : banks) {
+            if (bank.name.equals(name)) {
+                if(NameFetcher.getName(bank.owner).equals(playerName)){
+                    return new EconomyResponse(0, 0, EconomyResponse.ResponseType.SUCCESS, null);
+                } else {
+                    return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Player is not the owner");
+                }
+            }
+        }
+
+        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Bank not found");
     }
 
     /**
@@ -428,7 +507,17 @@ public class BalanceService implements Economy {
      */
     @Override
     public EconomyResponse isBankOwner(String name, OfflinePlayer player) {
-        throw new NotImplementedException();
+        for(Bank bank : banks) {
+            if (bank.name.equals(name)) {
+                if(NameFetcher.getName(bank.owner).equals(player.getName())){
+                    return new EconomyResponse(0, 0, EconomyResponse.ResponseType.SUCCESS, null);
+                } else {
+                    return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Player is not the owner");
+                }
+            }
+        }
+
+        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Bank not found");
     }
 
     /**
@@ -436,7 +525,17 @@ public class BalanceService implements Economy {
      */
     @Override
     public EconomyResponse isBankMember(String name, String playerName) {
-        throw new NotImplementedException();
+        for(Bank bank : banks) {
+            if (bank.name.equals(name)) {
+                if(bank.members.contains(UUIDFetcher.getUUID(playerName))){
+                    return new EconomyResponse(0, 0, EconomyResponse.ResponseType.SUCCESS, null);
+                } else {
+                    return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Player is not a member");
+                }
+            }
+        }
+
+        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Bank not found");
     }
 
     /**
@@ -448,7 +547,17 @@ public class BalanceService implements Economy {
      */
     @Override
     public EconomyResponse isBankMember(String name, OfflinePlayer player) {
-        throw new NotImplementedException();
+        for(Bank bank : banks) {
+            if (bank.name.equals(name)) {
+                if(bank.members.contains(player.getUniqueId())){
+                    return new EconomyResponse(0, 0, EconomyResponse.ResponseType.SUCCESS, null);
+                } else {
+                    return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Player is not a member");
+                }
+            }
+        }
+
+        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Bank not found");
     }
 
     /**
@@ -457,7 +566,12 @@ public class BalanceService implements Economy {
      */
     @Override
     public List<String> getBanks() {
-        throw new NotImplementedException();
+        List<String> bankNames = new ArrayList<>();
+        for(Bank bank : banks) {
+            bankNames.add(bank.name);
+        }
+
+        return bankNames;
     }
 
     /**
@@ -468,7 +582,7 @@ public class BalanceService implements Economy {
         if(hasAccount(playerName))
             return false;
 
-        balance.put(UUIDFetcher.getUUID(playerName), (double) ConfigManager.getInitial());
+        balances.put(UUIDFetcher.getUUID(playerName), new Balance((double) ConfigManager.getInitial()));
         return hasAccount(playerName);
     }
 
@@ -482,7 +596,7 @@ public class BalanceService implements Economy {
         if(hasAccount(player))
             return false;
 
-        balance.put(player.getUniqueId(), (double) ConfigManager.getInitial());
+        balances.put(player.getUniqueId(), new Balance((double) ConfigManager.getInitial()));
         return hasAccount(player);
     }
 
@@ -496,7 +610,7 @@ public class BalanceService implements Economy {
 
     /**
      * Attempts to create a player account for the given player on the specified world
-     * IMPLEMENTATION SPECIFIC - if an economy plugin does not support this the global balance will be returned.
+     * IMPLEMENTATION SPECIFIC - if an economy plugin does not support this the global balances will be returned.
      * @param player OfflinePlayer
      * @param worldName String name of the world
      * @return if the account creation was successful

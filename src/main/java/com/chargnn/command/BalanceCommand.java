@@ -1,8 +1,7 @@
 package com.chargnn.command;
 
 import com.chargnn.Main;
-import com.chargnn.api.UUIDFetcher;
-import com.chargnn.service.BalanceService;
+import com.chargnn.service.EconomyService;
 import com.chargnn.utils.Permissions;
 import com.chargnn.utils.file.ConfigManager;
 import net.milkbowl.vault.economy.Economy;
@@ -17,7 +16,7 @@ public class BalanceCommand implements CommandExecutor {
     private Economy econ;
 
     public BalanceCommand(Main main){
-        this.econ = new BalanceService();
+        this.econ = new EconomyService();
         this.main = main;
     }
 
@@ -30,7 +29,7 @@ public class BalanceCommand implements CommandExecutor {
         }
 
         switch (strings[0].toLowerCase()){
-            case "balance":{
+            case "balances":{
                 if(!commandSender.hasPermission(Permissions.BALANCE_CMD)){
                     noPersmission(commandSender);
                     return true;

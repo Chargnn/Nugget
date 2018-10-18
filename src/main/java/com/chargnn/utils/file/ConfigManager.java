@@ -17,7 +17,7 @@ public class ConfigManager {
     }
 
     public static int getInitial(){
-        return main.getConfig().getInt("balance.initial");
+        return main.getConfig().getInt("balances.initial");
     }
 
     public static String getCurrencyNamePlural(){

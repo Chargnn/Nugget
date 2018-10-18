@@ -6,12 +6,12 @@ description: Another economy plugin
 commands:
   ngt:
     description: Nugget base command
-    usage: /[set/add/clear] [player/balance] (amount)
+    usage: /[set/add/clear] [player/balances] (amount)
 permissions:
   ngt.balance:
-    description: Use to see player's balance
+    description: Use to see player's balances
   ngt.balance.other:
-    description: Use to see other player's balance
+    description: Use to see other player's balances
     default: op
   ngt.balance.add:
     description: Add an amount of money to a player

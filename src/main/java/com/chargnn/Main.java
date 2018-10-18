@@ -3,7 +3,7 @@ package com.chargnn;
 import com.chargnn.utils.file.BalanceFileManager;
 import com.chargnn.command.BalanceCommand;
 import com.chargnn.listener.PlayerListener;
-import com.chargnn.service.BalanceService;
+import com.chargnn.service.EconomyService;
 import com.chargnn.utils.file.ConfigManager;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -18,7 +18,7 @@ public class Main extends JavaPlugin
 {
     private static final Logger log = Logger.getLogger("Nugget");
     public ServicesManager sm = getServer().getServicesManager();
-    private BalanceFileManager balanceFile = new BalanceFileManager(this, "balance.yml");
+    private BalanceFileManager balanceFile = new BalanceFileManager(this, "balances.yml");
     private ConfigManager configManager;
 
     public Main() throws IOException {
@@ -55,7 +55,7 @@ public class Main extends JavaPlugin
 
     private boolean setupEconomy() {
         if (getServer().getPluginManager().getPlugin("Vault") != null) {
-            sm.register(Economy.class, new BalanceService(), this, ServicePriority.Highest);
+            sm.register(Economy.class, new EconomyService(), this, ServicePriority.Highest);
             return true;
         }
         return false;
