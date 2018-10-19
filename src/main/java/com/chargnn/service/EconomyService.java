@@ -240,7 +240,7 @@ public class EconomyService implements Economy {
         if(amount < 0)
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Cannot withdraw negative funds");
 
-        if(getBalance(playerName) >= amount) {
+        if(has(playerName, amount)) {
             balances.put(UUIDFetcher.getUUID(playerName), new Balance(getBalance(playerName) - amount));
             return new EconomyResponse(amount, getBalance(playerName), EconomyResponse.ResponseType.SUCCESS, null);
         } else {
@@ -260,7 +260,7 @@ public class EconomyService implements Economy {
         if(amount < 0)
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Cannot withdraw negative funds");
 
-        if(getBalance(player) >= amount) {
+        if(has(player, amount)) {
             balances.put(player.getUniqueId(), new Balance(getBalance(player) - amount));
             return new EconomyResponse(amount, getBalance(player), EconomyResponse.ResponseType.SUCCESS, null);
         } else {
@@ -482,12 +482,10 @@ public class EconomyService implements Economy {
 
         for(Bank bank : banks) {
             if (bank.name.equals(name)) {
-                if(bankHas(bank.name, amount).transactionSuccess()) {
+                System.out.println(bank.balance.amount);
                     bank.balance.amount += amount;
+                System.out.println(bank.balance.amount);
                     return new EconomyResponse(amount, bank.balance.amount, EconomyResponse.ResponseType.SUCCESS, null);
-                } else {
-                    return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Insufficient funds");
-                }
             }
         }
 

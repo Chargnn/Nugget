@@ -37,6 +37,7 @@ public class BankFileManager extends AbstractYml {
 
         for(String name : fileConfiguration.getConfigurationSection("banks").getKeys(false)){
             econ.createBank(name, Bukkit.getOfflinePlayer(UUID.fromString(fileConfiguration.getList("banks." + name).get(1).toString())));
+            econ.bankDeposit(name, Double.parseDouble(fileConfiguration.getList("banks." + name).get(0).toString()));
         }
     }
 }

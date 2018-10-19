@@ -38,8 +38,32 @@ public class BankCommand implements CommandExecutor {
         Player p = (Player) commandSender;
         OfflinePlayer sender = Bukkit.getOfflinePlayer(p.getUniqueId());
 
-        if (strings.length == 0 || strings.length > 2) {
+        if (strings.length > 2) {
             sendUsage(commandSender);
+            return true;
+        }
+
+        // /bank
+        if(strings.length == 0) {
+            if (!commandSender.hasPermission(Permissions.BANK_CMD)) {
+                noPersmission(commandSender);
+                return true;
+            }
+
+            Bank bank = null;
+
+            for(Bank b : EconomyService.banks){
+                if(b.owner.equals(sender.getUniqueId())){
+                    bank = b;
+                }
+            }
+
+            if(bank == null){
+                commandSender.sendMessage(ChatColor.RED + "You don't have any bank account");
+                return true;
+            }
+
+            commandSender.sendMessage(ChatColor.GREEN + "Bank balance:" + ChatColor.WHITE + " " + econ.bankBalance(bank.name).balance + " " + (econ.bankBalance(bank.name).amount > 1 ? ConfigManager.getCurrencyNamePlural() : ConfigManager.getCurrencyNameSingular()) + ".");
             return true;
         }
 
@@ -149,11 +173,15 @@ public class BankCommand implements CommandExecutor {
                         return true;
                     }
 
-                    if (econ.isBankOwner(bank.name, sender).transactionSuccess() && econ.bankHas(bank.name, x).transactionSuccess()) {
-                        if (econ.bankDeposit(bank.name, x).transactionSuccess() && econ.withdrawPlayer(sender, x).transactionSuccess()) {
-                            commandSender.sendMessage(x + " "  + (x > 1 ? ConfigManager.getCurrencyNamePlural() : ConfigManager.getCurrencyNameSingular()) + ChatColor.GREEN + " was removed from your bank");
+                    if (econ.isBankOwner(bank.name, sender).transactionSuccess()) {
+                        EconomyResponse resp = econ.bankDeposit(bank.name, x);
+                        EconomyResponse resp2 = econ.withdrawPlayer(sender, x);
+                        if (resp.transactionSuccess() && resp2.transactionSuccess()) {
+                            commandSender.sendMessage(x + " "  + (x > 1 ? ConfigManager.getCurrencyNamePlural() : ConfigManager.getCurrencyNameSingular()) + ChatColor.GREEN + " was added to your bank");
                             commandSender.sendMessage(ChatColor.GREEN + "You now have " + ChatColor.WHITE + econ.getBalance(sender) + " " + (x > 1 ? ConfigManager.getCurrencyNamePlural() : ConfigManager.getCurrencyNameSingular()) + ChatColor.GREEN + " on you");
                             return true;
+                        } else {
+                            commandSender.sendMessage(ChatColor.RED + resp.errorMessage + " " + resp2.errorMessage);
                         }
                     } else {
                         InsufficientFunds(commandSender);
