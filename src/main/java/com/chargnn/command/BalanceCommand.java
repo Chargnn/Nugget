@@ -5,10 +5,13 @@ import com.chargnn.service.EconomyService;
 import com.chargnn.utils.Permissions;
 import com.chargnn.utils.file.ConfigManager;
 import net.milkbowl.vault.economy.Economy;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public class BalanceCommand implements CommandExecutor {
 
@@ -23,56 +26,62 @@ public class BalanceCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
 
-        if(strings.length == 0 || strings.length > 3){
-            sendUsage(commandSender);
+        if(!(commandSender instanceof Player)){
+            commandSender.sendMessage("Player only command");
             return true;
         }
 
-        switch (strings[0].toLowerCase()){
-            case "balances":{
-                if(!commandSender.hasPermission(Permissions.BALANCE_CMD)){
-                    noPersmission(commandSender);
-                    return true;
-                }
+        Player p = (Player) commandSender;
+        OfflinePlayer sender = Bukkit.getOfflinePlayer(p.getUniqueId());
 
-                if(strings.length == 1) {
-                    if(!econ.hasAccount(commandSender.getName())){
-                        noAccount(commandSender, commandSender.getName(), false);
-                        return true;
-                    }
-
-                    commandSender.sendMessage(ChatColor.GREEN + "Balance:" + ChatColor.WHITE + " " +  econ.getBalance(commandSender.getName()) + " " + (econ.getBalance(commandSender.getName()) > 1 ? ConfigManager.getCurrencyNamePlural() : ConfigManager.getCurrencyNameSingular()) + ".");
-                    return true;
-                } else if(strings.length == 2){
-                    if(!econ.hasAccount(strings[1])){
-                        noAccount(commandSender, strings[1], false);
-                        return true;
-                    }
-
-                    if(!commandSender.hasPermission(Permissions.BALANCE_OTHER_CMD)){
-                        noPersmission(commandSender);
-                        return true;
-                    }
-
-                    commandSender.sendMessage(ChatColor.GREEN + "Balance of " + strings[1] + " :" + ChatColor.WHITE + " " + econ.getBalance(strings[1]) + " " + (econ.getBalance(commandSender.getName()) > 1 ? ConfigManager.getCurrencyNamePlural() : ConfigManager.getCurrencyNameSingular()) + ".");
-                    return true;
-                } else {
-                    sendUsage(commandSender);
-                    return true;
-                }
+        // /balance
+        if(strings.length == 0) {
+            if (!commandSender.hasPermission(Permissions.BALANCE_CMD)) {
+                noPersmission(commandSender);
+                return true;
             }
+
+            if (!econ.hasAccount(sender)) {
+                noAccount(commandSender, commandSender.getName(), false);
+                return true;
+            }
+
+            commandSender.sendMessage(ChatColor.GREEN + "Balance:" + ChatColor.WHITE + " " + econ.getBalance(sender) + " " + (econ.getBalance(sender) > 1 ? ConfigManager.getCurrencyNamePlural() : ConfigManager.getCurrencyNameSingular()) + ".");
+            return true;
+
+        }
+
+        // /balance {player}
+        if(strings.length == 1){
+            if(!commandSender.hasPermission(Permissions.BALANCE_OTHER_CMD)){
+                noPersmission(commandSender);
+                return true;
+            }
+
+            if(!econ.hasAccount(Bukkit.getPlayer(strings[0]))){
+                noAccount(commandSender, strings[0], false);
+                return true;
+            }
+
+            commandSender.sendMessage(ChatColor.GREEN + "Balance of " + strings[0] + " :" + ChatColor.WHITE + " " + econ.getBalance(strings[0]) + " " + (econ.getBalance(sender) > 1 ? ConfigManager.getCurrencyNamePlural() : ConfigManager.getCurrencyNameSingular()) + ".");
+            return true;
+        }
+
+
+        switch (strings[0].toLowerCase()){
+            // /balance add {player} {amount}
             case "add":{
                 if(!commandSender.hasPermission(Permissions.BALANCE_ADD_CMD)){
                     noPersmission(commandSender);
                     return true;
                 }
 
-                if(!econ.hasAccount(strings[1])){
-                    noAccount(commandSender, strings[1], true);
-                    return true;
-                }
-
                 if(strings.length == 3){
+                    if(!econ.hasAccount(Bukkit.getPlayer(strings[1]))){
+                        noAccount(commandSender, strings[1], true);
+                        return true;
+                    }
+
                     double x;
 
                     try{
@@ -87,26 +96,29 @@ public class BalanceCommand implements CommandExecutor {
                         return true;
                     }
 
-                    econ.depositPlayer(strings[1], x);
-                    commandSender.sendMessage(ChatColor.GREEN + "Successfully added " + ChatColor.WHITE + x + " " + (x > 1 ? ConfigManager.getCurrencyNamePlural() : ConfigManager.getCurrencyNameSingular()) + ChatColor.GREEN + " to " + ChatColor.WHITE + strings[1] + ".");
-                    return true;
+                    if(econ.depositPlayer(Bukkit.getPlayer(strings[1]), x).transactionSuccess()) {
+                        commandSender.sendMessage(ChatColor.GREEN + "Successfully added " + ChatColor.WHITE + x + " " + (x > 1 ? ConfigManager.getCurrencyNamePlural() : ConfigManager.getCurrencyNameSingular()) + ChatColor.GREEN + " to " + ChatColor.WHITE + strings[1] + ".");
+                        return true;
+                    }
                 } else {
                     sendUsage(commandSender);
                     return true;
                 }
+                return false;
             }
+            // /balance sub {player} {amount}
             case "sub":{
                 if(!commandSender.hasPermission(Permissions.BALANCE_SUB_CMD)){
                     noPersmission(commandSender);
                     return true;
                 }
 
-                if(!econ.hasAccount(strings[1])){
-                    noAccount(commandSender, strings[1], true);
-                    return true;
-                }
-
                 if(strings.length == 3){
+                    if(!econ.hasAccount(Bukkit.getPlayer(strings[1]))){
+                        noAccount(commandSender, strings[1], true);
+                        return true;
+                    }
+
                     double x;
 
                     try{
@@ -120,26 +132,29 @@ public class BalanceCommand implements CommandExecutor {
                         return true;
                     }
 
-                    econ.withdrawPlayer(strings[1], x);
-                    commandSender.sendMessage(ChatColor.GREEN + "Successfully removed " + ChatColor.WHITE + x + " " + (x > 1 ? ConfigManager.getCurrencyNamePlural() : ConfigManager.getCurrencyNameSingular()) + ChatColor.GREEN + " to " + ChatColor.WHITE + strings[1] + ".");
-                    return true;
+                   if(econ.withdrawPlayer(Bukkit.getPlayer(strings[1]), x).transactionSuccess()) {
+                       commandSender.sendMessage(ChatColor.GREEN + "Successfully removed " + ChatColor.WHITE + x + " " + (x > 1 ? ConfigManager.getCurrencyNamePlural() : ConfigManager.getCurrencyNameSingular()) + ChatColor.GREEN + " to " + ChatColor.WHITE + strings[1] + ".");
+                       return true;
+                   }
                 } else {
                     sendUsage(commandSender);
                     return true;
                 }
+                return false;
             }
+            // /balance set {player} {amount}
             case "set":{
                 if(!commandSender.hasPermission(Permissions.BALANCE_SET_CMD)){
                     noPersmission(commandSender);
                     return true;
                 }
 
-                if(!econ.hasAccount(strings[1])){
-                    noAccount(commandSender, strings[1], true);
-                    return true;
-                }
-
                 if(strings.length == 3){
+                    if(!econ.hasAccount(strings[1])){
+                        noAccount(commandSender, strings[1], true);
+                        return true;
+                    }
+
                     double x;
 
                     try{
@@ -153,14 +168,15 @@ public class BalanceCommand implements CommandExecutor {
                         return true;
                     }
 
-                    econ.withdrawPlayer(strings[1], econ.getBalance(strings[1]));
-                    econ.depositPlayer(strings[1], x);
-                    commandSender.sendMessage(ChatColor.GREEN + "Successfully set " + ChatColor.WHITE + x + " " + (x > 1 ? ConfigManager.getCurrencyNamePlural() : ConfigManager.getCurrencyNameSingular()) + ChatColor.GREEN + " to " + ChatColor.WHITE + strings[1] + ".");
-                    return true;
+                    if(econ.withdrawPlayer(strings[1], econ.getBalance(Bukkit.getPlayer(strings[1]))).transactionSuccess() &&  econ.depositPlayer(Bukkit.getPlayer(strings[1]), x).transactionSuccess()) {
+                        commandSender.sendMessage(ChatColor.GREEN + "Successfully set " + ChatColor.WHITE + x + " " + (x > 1 ? ConfigManager.getCurrencyNamePlural() : ConfigManager.getCurrencyNameSingular()) + ChatColor.GREEN + " to " + ChatColor.WHITE + strings[1] + ".");
+                        return true;
+                    }
                 } else {
                     sendUsage(commandSender);
                     return true;
                 }
+                return false;
             }
             default:{
                 sendUsage(commandSender);
@@ -182,7 +198,7 @@ public class BalanceCommand implements CommandExecutor {
     }
 
     private void sendUsage(CommandSender cs){
-        cs.sendMessage(ChatColor.RED + main.getCommand("ngt").getUsage());
+        cs.sendMessage(ChatColor.RED + main.getCommand("balance").getUsage());
     }
 
     private void invalidAmount(CommandSender cs){

@@ -1,9 +1,11 @@
 package com.chargnn;
 
+import com.chargnn.command.BankCommand;
 import com.chargnn.utils.file.BalanceFileManager;
 import com.chargnn.command.BalanceCommand;
 import com.chargnn.listener.PlayerListener;
 import com.chargnn.service.EconomyService;
+import com.chargnn.utils.file.BankFileManager;
 import com.chargnn.utils.file.ConfigManager;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -19,6 +21,8 @@ public class Main extends JavaPlugin
     private static final Logger log = Logger.getLogger("Nugget");
     public ServicesManager sm = getServer().getServicesManager();
     private BalanceFileManager balanceFile = new BalanceFileManager(this, "balances.yml");
+    private BankFileManager banksFile = new BankFileManager(this, "banks.yml");
+
     private ConfigManager configManager;
 
     public Main() throws IOException {
@@ -35,8 +39,10 @@ public class Main extends JavaPlugin
 
         configManager.setup();
         balanceFile.loadBalances();
+        banksFile.loadBanks();
 
-        getCommand("ngt").setExecutor(new BalanceCommand(this));
+        getCommand("balance").setExecutor(new BalanceCommand(this));
+        getCommand("bank").setExecutor(new BankCommand(this));
         Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
 
         log.info(String.format("[%s] Enabled Version %s", getDescription().getName(), getDescription().getVersion()));
@@ -46,6 +52,7 @@ public class Main extends JavaPlugin
     public void onDisable(){
         try {
             balanceFile.saveBalances();
+            banksFile.saveBanks();
         } catch (IOException e) {
             e.printStackTrace();
         }

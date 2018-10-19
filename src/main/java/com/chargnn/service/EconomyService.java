@@ -345,6 +345,13 @@ public class EconomyService implements Economy {
     @Override
     public EconomyResponse createBank(String name, String owner) {
         Bank bank = new Bank(name, UUIDFetcher.getUUID(owner));
+
+        for(Bank b : banks){
+            if(b.owner.equals(UUIDFetcher.getUUID(owner))){
+                return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Player already has a bank account");
+            }
+        }
+
         if(!banks.contains(bank)) {
             banks.add(bank);
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.SUCCESS, null);
@@ -362,6 +369,13 @@ public class EconomyService implements Economy {
     @Override
     public EconomyResponse createBank(String name, OfflinePlayer player) {
         Bank bank = new Bank(name, player.getUniqueId());
+
+        for(Bank b : banks){
+            if(b.owner.equals(player.getUniqueId())){
+                return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Player already has a bank account");
+            }
+        }
+
         if(!banks.contains(bank)) {
             banks.add(bank);
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.SUCCESS, null);
@@ -509,7 +523,7 @@ public class EconomyService implements Economy {
     public EconomyResponse isBankOwner(String name, OfflinePlayer player) {
         for(Bank bank : banks) {
             if (bank.name.equals(name)) {
-                if(NameFetcher.getName(bank.owner).equals(player.getName())){
+                if(player.getUniqueId().equals(bank.owner)){
                     return new EconomyResponse(0, 0, EconomyResponse.ResponseType.SUCCESS, null);
                 } else {
                     return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Player is not the owner");

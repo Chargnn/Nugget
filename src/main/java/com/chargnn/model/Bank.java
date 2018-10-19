@@ -13,6 +13,7 @@ public class Bank {
     public Bank(String name, UUID owner){
         this.name = name;
         this.owner = owner;
+        this.balance = new Balance(0);
     }
 
 }
