@@ -14,7 +14,6 @@ public class Permissions {
     public static final String BANK_REMOVE_OTHER_CMD = BANK_REMOVE_CMD + ".other";
     public static final String BANK_SUB_CMD = BANK_CMD + ".sub";
     public static final String BANK_ADD_CMD = BANK_CMD + ".add";
-    public static final String BANK_SUB_OTHER_CMD = BANK_SUB_CMD + ".other";
-    public static final String BANK_ADD_OTHER_CMD = BANK_ADD_CMD + ".other";
+
 
 }

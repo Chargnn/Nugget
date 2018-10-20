@@ -40,6 +40,7 @@ public class Main extends JavaPlugin
         configManager.setup();
         balanceFile.loadBalances();
         banksFile.loadBanks();
+        log.info("Balances and banks info loaded");
 
         getCommand("balance").setExecutor(new BalanceCommand(this));
         getCommand("bank").setExecutor(new BankCommand(this));
@@ -53,6 +54,7 @@ public class Main extends JavaPlugin
         try {
             balanceFile.saveBalances();
             banksFile.saveBanks();
+            log.info("Balances and banks info saved");
         } catch (IOException e) {
             e.printStackTrace();
         }

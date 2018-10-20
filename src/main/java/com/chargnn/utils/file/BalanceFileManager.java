@@ -1,7 +1,6 @@
 package com.chargnn.utils.file;
 
 import com.chargnn.Main;
-import com.chargnn.api.NameFetcher;
 import com.chargnn.service.EconomyService;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -19,7 +18,7 @@ public class BalanceFileManager extends AbstractYml {
 
     public void saveBalances() throws IOException {
         for(UUID uuid : EconomyService.balances.keySet()){
-            fileConfiguration.set("balances." + uuid, EconomyService.balances.get(uuid).amount);
+            fileConfiguration.set("balances." + uuid, EconomyService.balances.get(uuid).getAmount());
         }
 
         this.save();

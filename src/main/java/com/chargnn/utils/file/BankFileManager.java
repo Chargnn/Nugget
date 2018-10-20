@@ -21,7 +21,7 @@ public class BankFileManager extends AbstractYml {
 
     public void saveBanks() throws IOException {
         for(Bank bank : EconomyService.banks){
-            fileConfiguration.set("banks." + bank.name, Arrays.asList(bank.balance.amount, bank.owner.toString()));
+            fileConfiguration.set("banks." + bank.name, Arrays.asList(bank.balance.getAmount(), bank.owner.toString()));
         }
 
         this.save();

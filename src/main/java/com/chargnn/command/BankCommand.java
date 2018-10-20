@@ -64,6 +64,7 @@ public class BankCommand implements CommandExecutor {
             }
 
             commandSender.sendMessage(ChatColor.GREEN + "Bank balance:" + ChatColor.WHITE + " " + econ.bankBalance(bank.name).balance + " " + (econ.bankBalance(bank.name).amount > 1 ? ConfigManager.getCurrencyNamePlural() : ConfigManager.getCurrencyNameSingular()) + ".");
+            System.out.println(econ.getBanks());
             return true;
         }
 
@@ -141,7 +142,7 @@ public class BankCommand implements CommandExecutor {
             }
             // /bank add {amount}
             case "add": {
-                if (!commandSender.hasPermission(Permissions.BANK_SUB_CMD)) {
+                if (!commandSender.hasPermission(Permissions.BANK_ADD_CMD)) {
                     noPersmission(commandSender);
                     return true;
                 }

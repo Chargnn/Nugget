@@ -9,10 +9,13 @@ import com.chargnn.utils.file.ConfigManager;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.OfflinePlayer;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class EconomyService implements Economy {
 
@@ -66,8 +69,6 @@ public class EconomyService implements Economy {
      */
     @Override
     public String format(double amount) {
-        amount = Math.ceil(amount);
-
         return String.format("%d %s", (int)amount, "$");
     }
 
@@ -143,7 +144,7 @@ public class EconomyService implements Economy {
     @Override
     public double getBalance(String playerName) {
         if(hasAccount(playerName)) {
-            return balances.get(UUIDFetcher.getUUID(playerName)).amount;
+            return balances.get(UUIDFetcher.getUUID(playerName)).getAmount();
         } else{
             return 0;
         }
@@ -158,7 +159,7 @@ public class EconomyService implements Economy {
     @Override
     public double getBalance(OfflinePlayer player) {
         if(hasAccount(player)) {
-            return balances.get(player.getUniqueId()).amount;
+            return balances.get(player.getUniqueId()).getAmount();
         } else{
             return 0;
         }
@@ -410,7 +411,7 @@ public class EconomyService implements Economy {
     public EconomyResponse bankBalance(String name) {
         for(Bank bank : banks) {
             if (bank.name.equals(name)) {
-                return new EconomyResponse(0, bank.balance.amount, EconomyResponse.ResponseType.SUCCESS, null);
+                return new EconomyResponse(0, bank.balance.getAmount(), EconomyResponse.ResponseType.SUCCESS, null);
             }
         }
 
@@ -431,8 +432,8 @@ public class EconomyService implements Economy {
 
         for(Bank bank : banks) {
             if (bank.name.equals(name)) {
-                if(bank.balance.amount >= amount) {
-                    return new EconomyResponse(amount, bank.balance.amount, EconomyResponse.ResponseType.SUCCESS, null);
+                if(bank.balance.getAmount() >= amount) {
+                    return new EconomyResponse(amount, bank.balance.getAmount(), EconomyResponse.ResponseType.SUCCESS, null);
                 } else {
                     return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Insufficient funds");
                 }
@@ -457,8 +458,8 @@ public class EconomyService implements Economy {
         for(Bank bank : banks) {
             if (bank.name.equals(name)) {
                 if(bankHas(bank.name, amount).transactionSuccess()) {
-                    bank.balance.amount -= amount;
-                    return new EconomyResponse(amount, bank.balance.amount, EconomyResponse.ResponseType.SUCCESS, null);
+                    bank.balance.setAmount(bank.balance.getAmount() - amount);
+                    return new EconomyResponse(amount, bank.balance.getAmount(), EconomyResponse.ResponseType.SUCCESS, null);
                 } else {
                     return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Insufficient funds");
                 }
@@ -482,10 +483,8 @@ public class EconomyService implements Economy {
 
         for(Bank bank : banks) {
             if (bank.name.equals(name)) {
-                System.out.println(bank.balance.amount);
-                    bank.balance.amount += amount;
-                System.out.println(bank.balance.amount);
-                    return new EconomyResponse(amount, bank.balance.amount, EconomyResponse.ResponseType.SUCCESS, null);
+                bank.balance.setAmount(bank.balance.getAmount() + amount);
+                    return new EconomyResponse(amount, bank.balance.getAmount(), EconomyResponse.ResponseType.SUCCESS, null);
             }
         }
 
@@ -537,7 +536,7 @@ public class EconomyService implements Economy {
      */
     @Override
     public EconomyResponse isBankMember(String name, String playerName) {
-        for(Bank bank : banks) {
+        /*for(Bank bank : banks) {
             if (bank.name.equals(name)) {
                 if(bank.members.contains(UUIDFetcher.getUUID(playerName))){
                     return new EconomyResponse(0, 0, EconomyResponse.ResponseType.SUCCESS, null);
@@ -547,7 +546,8 @@ public class EconomyService implements Economy {
             }
         }
 
-        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Bank not found");
+        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Bank not found");*/
+        throw new NotImplementedException();
     }
 
     /**
@@ -559,7 +559,7 @@ public class EconomyService implements Economy {
      */
     @Override
     public EconomyResponse isBankMember(String name, OfflinePlayer player) {
-        for(Bank bank : banks) {
+        /*for(Bank bank : banks) {
             if (bank.name.equals(name)) {
                 if(bank.members.contains(player.getUniqueId())){
                     return new EconomyResponse(0, 0, EconomyResponse.ResponseType.SUCCESS, null);
@@ -569,7 +569,8 @@ public class EconomyService implements Economy {
             }
         }
 
-        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Bank not found");
+        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Bank not found");*/
+        throw new NotImplementedException();
     }
 
     /**
@@ -583,7 +584,7 @@ public class EconomyService implements Economy {
             bankNames.add(bank.name);
         }
 
-        return bankNames;
+        return banks.stream().map(x -> x.name).collect(Collectors.toList());
     }
 
     /**
