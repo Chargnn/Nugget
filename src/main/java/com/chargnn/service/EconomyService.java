@@ -579,11 +579,6 @@ public class EconomyService implements Economy {
      */
     @Override
     public List<String> getBanks() {
-        List<String> bankNames = new ArrayList<>();
-        for(Bank bank : banks) {
-            bankNames.add(bank.name);
-        }
-
         return banks.stream().map(x -> x.name).collect(Collectors.toList());
     }
 

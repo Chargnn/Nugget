@@ -51,11 +51,10 @@ public class BankCommand implements CommandExecutor {
             }
 
             Bank bank = null;
-
-            for(Bank b : EconomyService.banks){
-                if(b.owner.equals(sender.getUniqueId())){
-                    bank = b;
-                }
+            if(EconomyService.banks.size() > 1000) {
+                bank = EconomyService.banks.stream().parallel().filter(x -> x.owner.equals(sender.getUniqueId())).findFirst().orElse(null);
+            } else {
+                bank = EconomyService.banks.stream().filter(x -> x.owner.equals(sender.getUniqueId())).findFirst().orElse(null);
             }
 
             if(bank == null){
@@ -64,7 +63,6 @@ public class BankCommand implements CommandExecutor {
             }
 
             commandSender.sendMessage(ChatColor.GREEN + "Bank balance:" + ChatColor.WHITE + " " + econ.bankBalance(bank.name).balance + " " + (econ.bankBalance(bank.name).amount > 1 ? ConfigManager.getCurrencyNamePlural() : ConfigManager.getCurrencyNameSingular()) + ".");
-            System.out.println(econ.getBanks());
             return true;
         }
 
@@ -104,11 +102,10 @@ public class BankCommand implements CommandExecutor {
 
                 if (strings.length == 2) {
                     Bank bank = null;
-
-                    for(Bank b : EconomyService.banks){
-                        if(b.owner.equals(sender.getUniqueId())){
-                            bank = b;
-                        }
+                    if(EconomyService.banks.size() > 1000) {
+                        bank = EconomyService.banks.stream().parallel().filter(x -> x.owner.equals(sender.getUniqueId())).findFirst().orElse(null);
+                    } else {
+                        bank = EconomyService.banks.stream().filter(x -> x.owner.equals(sender.getUniqueId())).findFirst().orElse(null);
                     }
 
                     if(bank == null){
@@ -149,11 +146,10 @@ public class BankCommand implements CommandExecutor {
 
                 if (strings.length == 2) {
                     Bank bank = null;
-
-                    for(Bank b : EconomyService.banks){
-                        if(b.owner.equals(sender.getUniqueId())){
-                            bank = b;
-                        }
+                    if(EconomyService.banks.size() > 1000) {
+                        bank = EconomyService.banks.stream().parallel().filter(x -> x.owner.equals(sender.getUniqueId())).findFirst().orElse(null);
+                    } else {
+                        bank = EconomyService.banks.stream().filter(x -> x.owner.equals(sender.getUniqueId())).findFirst().orElse(null);
                     }
 
                     if(bank == null){
@@ -203,11 +199,10 @@ public class BankCommand implements CommandExecutor {
 
                 if (strings.length == 2) {
                     Bank bank = null;
-
-                    for(Bank b : EconomyService.banks){
-                        if(b.owner.equals(sender.getUniqueId())){
-                            bank = b;
-                        }
+                    if(EconomyService.banks.size() > 1000) {
+                        bank = EconomyService.banks.stream().parallel().filter(x -> x.owner.equals(sender.getUniqueId())).findFirst().orElse(null);
+                    } else {
+                        bank = EconomyService.banks.stream().filter(x -> x.owner.equals(sender.getUniqueId())).findFirst().orElse(null);
                     }
 
                     if(bank == null){
